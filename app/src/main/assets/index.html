@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Football 24</title>
+<meta name="application-name" content="Football 24">
+<meta name="apple-mobile-web-app-title" content="Football 24">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0d1016">
+<meta name="author" content="Mohammed Eyd Kadher">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<style>
+:root{--bg:#0d1016;--card:#161a23;--card2:#1e2330;--text:#e9ebf1;--muted:#8a93a6;--acc:#00c46a;--live:#ff3d3d;--line:#252b38}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,"Segoe UI",Tahoma,sans-serif;max-width:760px;margin:auto;padding-bottom:90px;-webkit-tap-highlight-color:transparent}
+header{position:sticky;top:0;background:var(--bg);z-index:5;padding:12px 16px 8px;border-bottom:1px solid var(--line)}
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.logo{font-weight:800;font-size:20px}.logo span{color:var(--acc)}
+.livebtn{background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:20px;padding:6px 12px;font-size:13px;cursor:pointer}
+.livebtn.on{background:var(--live);border-color:var(--live)}
+.dates{display:flex;gap:6px;align-items:center;margin-bottom:10px}
+.dates button{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:7px 12px;cursor:pointer;font-size:14px}
+.dates .today{flex:1;font-weight:600}
+.dates input{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:6px;font-size:13px;color-scheme:dark;width:130px}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{white-space:nowrap;background:var(--card);border:1px solid var(--line);color:var(--muted);border-radius:18px;padding:6px 12px;font-size:13px;cursor:pointer}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#04130b;font-weight:700}
+main{padding:12px 16px}
+.group{background:var(--card);border-radius:14px;margin-bottom:12px;overflow:hidden}
+.ghead{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card2);font-weight:700;font-size:14px}
+.ghead img{width:20px;height:20px;object-fit:contain}
+.match{display:grid;grid-template-columns:1fr 84px 1fr;align-items:center;padding:12px 14px;border-top:1px solid var(--line);cursor:pointer;gap:6px}
+.match:hover{background:#1a1f2a}
+.team{display:flex;align-items:center;gap:8px;font-size:14px;min-width:0}
+.team.away{flex-direction:row-reverse;text-align:left}
+.team img{width:26px;height:26px;object-fit:contain;flex-shrink:0}
+.team span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.team.win span{font-weight:700}
+.mid{text-align:center}
+.score{font-size:19px;font-weight:800;display:flex;justify-content:center;gap:7px;direction:rtl}
+.time{font-size:15px;font-weight:600}
+.st{font-size:11px;color:var(--muted);margin-top:2px}
+.st.live{color:var(--live);font-weight:700;animation:blink 1.4s infinite}
+@keyframes blink{50%{opacity:.45}}
+.msg{text-align:center;color:var(--muted);padding:50px 10px;line-height:1.8}
+.spin{width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--acc);border-radius:50%;margin:60px auto;animation:r .8s linear infinite}
+@keyframes r{to{transform:rotate(360deg)}}
+nav{display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:3px;margin-bottom:10px;gap:3px}
+nav button{flex:1;background:none;border:0;color:var(--muted);padding:8px 0;font-size:14px;cursor:pointer;border-radius:9px;font-weight:600}
+nav button b{font-weight:400;margin-left:5px}
+nav button.on{background:var(--acc);color:#04130b}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{color:var(--muted);font-weight:500;padding:8px 4px;text-align:center}
+td{padding:9px 4px;text-align:center;border-top:1px solid var(--line)}
+td.tn{text-align:right;display:flex;align-items:center;gap:7px}
+td.tn img{width:20px;height:20px;object-fit:contain}
+td.pts{font-weight:800;color:var(--acc)}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10;display:none;align-items:flex-end;justify-content:center}
+.sheet.show{display:flex}
+.panel{background:var(--bg);width:100%;max-width:760px;max-height:90vh;overflow-y:auto;border-radius:18px 18px 0 0;padding:16px}
+.close{background:var(--card2);border:0;color:var(--text);border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer}
+.mh{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;text-align:center;padding:14px 0 18px;gap:8px}
+.mh img{width:56px;height:56px;object-fit:contain}
+.mh .nm{font-size:14px;font-weight:600;margin-top:6px}
+.mh .big{font-size:34px;font-weight:800;display:flex;justify-content:center;gap:10px;direction:rtl}
+.sec{background:var(--card);border-radius:14px;padding:12px 14px;margin-bottom:12px}
+.sec h3{font-size:14px;margin-bottom:10px;color:var(--muted)}
+.ev{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:14px}
+.ev.a{flex-direction:row-reverse;text-align:left}
+.ev .min{color:var(--muted);font-size:12px;width:38px;text-align:center;direction:ltr}
+.stat{margin-bottom:12px}
+.stat .row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.bar{display:flex;height:6px;border-radius:4px;overflow:hidden;background:var(--card2);gap:3px}
+.bar i{display:block;background:var(--acc);border-radius:4px}
+.bar i.b{background:#5b8cff}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:18px 16px 8px;line-height:1.7}
+.info{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.info:first-of-type{border-top:0}
+.info span{color:var(--muted);white-space:nowrap}
+.info b{font-weight:600;text-align:left}
+.pitch{background:repeating-linear-gradient(#0e5a34 0 34px,#0c5130 34px 68px);border:2px solid #2a8a57;border-radius:12px;padding:14px 2px;display:flex;flex-direction:column-reverse;gap:16px;position:relative;overflow:hidden}
+.pitch:before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:#2a8a57}
+.prow{display:flex;justify-content:space-around;position:relative}
+.pl{display:flex;flex-direction:column;align-items:center;width:66px;font-size:11px;text-align:center}
+.pl i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:12px;border:2px solid #fff;box-shadow:0 2px 4px #0006}
+.pl span{margin-top:4px;line-height:1.25;max-width:66px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 2px #000}
+.lt{display:flex;align-items:center;justify-content:space-between;margin:4px 0 8px;font-weight:700;font-size:14px}
+.lt em{font-style:normal;color:var(--acc);direction:ltr}
+.subs{margin-top:8px;font-size:13px}
+.subs div{display:flex;gap:8px;padding:5px 0;border-top:1px solid var(--line)}
+.subs b{width:24px;color:var(--muted);text-align:center}
+.tabs2{display:flex;gap:6px;margin-bottom:10px}
+.tabs2 button{flex:1;background:var(--card2);border:1px solid var(--line);color:var(--muted);border-radius:9px;padding:7px;font-size:13px;cursor:pointer}
+.tabs2 button.on{background:var(--acc);color:#04130b;font-weight:700;border-color:var(--acc)}
+.upd{font-size:11px;color:var(--muted);text-align:center;margin-top:4px}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <div class="logo">Football <span>24</span></div>
+    <button class="livebtn" id="liveBtn">● مباشر فقط</button>
+  </div>
+  <nav>
+    <button class="on" data-v="matches"><b>⚽</b>المباريات</button>
+    <button data-v="table"><b>📊</b>الترتيب</button>
+  </nav>
+  <div class="dates" id="dates">
+    <button id="next">›</button>
+    <button class="today" id="todayBtn">اليوم</button>
+    <button id="prev">‹</button>
+    <input type="date" id="pick">
+  </div>
+  <div class="chips" id="chips"></div>
+</header>
+<main id="main"></main>
+<footer dir="ltr">© 2026 Mohammed Eyd Kadher. All Rights Reserved.</footer>
+<div class="sheet" id="sheet"><div class="panel" id="panel"></div></div>
+
+<script>
+// ===== الإعدادات =====
+const API = 'https://site.api.espn.com/apis/site/v2/sports/soccer/';
+const API_TABLE = 'https://site.api.espn.com/apis/v2/sports/soccer/';
+const LEAGUES = [
+  {id:'uefa.champions', n:'دوري أبطال أوروبا'},
+  {id:'eng.1', n:'الدوري الإنجليزي'},
+  {id:'esp.1', n:'الدوري الإسباني'},
+  {id:'ita.1', n:'الدوري الإيطالي'},
+  {id:'ger.1', n:'الدوري الألماني'},
+  {id:'fra.1', n:'الدوري الفرنسي'},
+  {id:'ksa.1', n:'الدوري السعودي'},
+  {id:'afc.champions', n:'دوري أبطال آسيا'},
+  {id:'uefa.europa', n:'الدوري الأوروبي'},
+  {id:'uefa.nations', n:'دوري الأمم الأوروبية'},
+  {id:'fifa.friendly', n:'مباريات ودية دولية'}
+];
+const REFRESH_SEC = 30;
+
+// ===== أسماء الفرق بالعربي =====
+const TEAM_AR = {
+"Arsenal":"آرسنال","Aston Villa":"أستون فيلا","Bournemouth":"بورنموث","AFC Bournemouth":"بورنموث","Brentford":"برينتفورد","Brighton":"برايتون","Brighton & Hove Albion":"برايتون","Burnley":"بيرنلي","Chelsea":"تشيلسي","Crystal Palace":"كريستال بالاس","Everton":"إيفرتون","Fulham":"فولهام","Leeds":"ليدز","Leeds United":"ليدز يونايتد","Liverpool":"ليفربول","Man City":"مانشستر سيتي","Manchester City":"مانشستر سيتي","Man United":"مانشستر يونايتد","Manchester United":"مانشستر يونايتد","Newcastle":"نيوكاسل","Newcastle United":"نيوكاسل يونايتد","Nottm Forest":"نوتنغهام فورست","Nott'm Forest":"نوتنغهام فورست","Nottingham Forest":"نوتنغهام فورست","Sunderland":"سندرلاند","Spurs":"توتنهام","Tottenham":"توتنهام","Tottenham Hotspur":"توتنهام","West Ham":"وست هام","West Ham United":"وست هام","Wolves":"وولفرهامبتون","Wolverhampton Wanderers":"وولفرهامبتون","Leicester":"ليستر سيتي","Leicester City":"ليستر سيتي","Southampton":"ساوثهامبتون","Ipswich":"إيبسويتش","Ipswich Town":"إيبسويتش","Coventry":"كوفنتري","Coventry City":"كوفنتري","Sheffield United":"شيفيلد يونايتد","Middlesbrough":"ميدلزبره",
+"Real Madrid":"ريال مدريد","Barcelona":"برشلونة","Atlético":"أتلتيكو مدريد","Atlético Madrid":"أتلتيكو مدريد","Atletico Madrid":"أتلتيكو مدريد","Athletic":"أتلتيك بيلباو","Athletic Club":"أتلتيك بيلباو","Real Sociedad":"ريال سوسيداد","Villarreal":"فياريال","Betis":"ريال بيتيس","Real Betis":"ريال بيتيس","Sevilla":"إشبيلية","Valencia":"فالنسيا","Celta":"سيلتا فيغو","Celta Vigo":"سيلتا فيغو","Getafe":"خيتافي","Rayo":"رايو فاليكانو","Rayo Vallecano":"رايو فاليكانو","Osasuna":"أوساسونا","Mallorca":"مايوركا","Girona":"جيرونا","Alavés":"ألافيس","Deportivo Alavés":"ألافيس","Espanyol":"إسبانيول","Elche":"إلتشي","Levante":"ليفانتي","Oviedo":"ريال أوفييدو","Real Oviedo":"ريال أوفييدو","Las Palmas":"لاس بالماس","Leganés":"ليغانيس","Valladolid":"بلد الوليد","Real Valladolid":"بلد الوليد","Racing Santander":"راسينغ سانتاندير",
+"Inter":"إنتر ميلان","Inter Milan":"إنتر ميلان","Internazionale":"إنتر ميلان","AC Milan":"ميلان","Milan":"ميلان","Juventus":"يوفنتوس","Napoli":"نابولي","Roma":"روما","AS Roma":"روما","Lazio":"لاتسيو","Atalanta":"أتالانتا","Fiorentina":"فيورنتينا","Bologna":"بولونيا","Torino":"تورينو","Genoa":"جنوى","Udinese":"أودينيزي","Cagliari":"كالياري","Lecce":"ليتشي","Parma":"بارما","Como":"كومو","Verona":"فيرونا","Hellas Verona":"فيرونا","Sassuolo":"ساسولو","Pisa":"بيزا","Cremonese":"كريمونيزي","Frosinone":"فروزينوني","Monza":"مونزا","Venezia":"فينيسيا","Empoli":"إمبولي","Palermo":"باليرمو",
+"Bayern Munich":"بايرن ميونخ","Bayern":"بايرن ميونخ","Dortmund":"دورتموند","Borussia Dortmund":"بوروسيا دورتموند","Leverkusen":"باير ليفركوزن","Bayer Leverkusen":"باير ليفركوزن","RB Leipzig":"لايبزيغ","Leipzig":"لايبزيغ","Frankfurt":"آينتراخت فرانكفورت","Eintracht Frankfurt":"آينتراخت فرانكفورت","Stuttgart":"شتوتغارت","VfB Stuttgart":"شتوتغارت","Freiburg":"فرايبورغ","SC Freiburg":"فرايبورغ","Wolfsburg":"فولفسبورغ","VfL Wolfsburg":"فولفسبورغ","M'gladbach":"مونشنغلادباخ","Gladbach":"مونشنغلادباخ","Borussia Mönchengladbach":"مونشنغلادباخ","Werder Bremen":"فيردر بريمن","Hoffenheim":"هوفنهايم","TSG Hoffenheim":"هوفنهايم","Union Berlin":"يونيون برلين","1. FC Union Berlin":"يونيون برلين","Mainz":"ماينز","Mainz 05":"ماينز","Augsburg":"أوغسبورغ","FC Augsburg":"أوغسبورغ","Heidenheim":"هايدنهايم","St. Pauli":"سانت باولي","FC St. Pauli":"سانت باولي","Hamburg":"هامبورغ","Hamburg SV":"هامبورغ","FC Cologne":"كولن","1. FC Köln":"كولن","Köln":"كولن","Bochum":"بوخوم",
+"Paris Saint-Germain":"باريس سان جيرمان","PSG":"باريس سان جيرمان","Marseille":"مارسيليا","Lyon":"ليون","Monaco":"موناكو","AS Monaco":"موناكو","Lille":"ليل","Nice":"نيس","Lens":"لانس","Rennes":"رين","Stade Rennais":"رين","Strasbourg":"ستراسبورغ","Nantes":"نانت","Toulouse":"تولوز","Brest":"بريست","Auxerre":"أوكسير","Angers":"أنجيه","Le Havre":"لوهافر","Lorient":"لوريان","Metz":"ميتز","Paris FC":"باريس إف سي",
+"Al Hilal":"الهلال","Al Nassr":"النصر","Al Ittihad":"الاتحاد","Al Ahli":"الأهلي","Al Qadsiah":"القادسية","Al Shabab":"الشباب","Al Ettifaq":"الاتفاق","Al Taawoun":"التعاون","Al Fateh":"الفتح","Al Khaleej":"الخليج","Al Fayha":"الفيحاء","Al Feiha":"الفيحاء","Al Riyadh":"الرياض","Damac":"ضمك","Al Okhdood":"الأخدود","Al Hazem":"الحزم","Al Kholood":"الخلود","Al Najma":"النجمة","NEOM":"نيوم","Al Wehda":"الوحدة",
+"Al Sadd":"السد","Al Duhail":"الدحيل","Al Gharafa":"الغرافة","Al Rayyan":"الريان","Al Ain":"العين","Al Wahda":"الوحدة","Shabab Al Ahli":"شباب الأهلي","Sharjah":"الشارقة","Al Wasl":"الوصل","Persepolis":"برسبوليس","Esteghlal":"استقلال طهران","Tractor":"تراكتور","Sepahan":"سباهان","Al Shorta":"الشرطة","Al Zawraa":"الزوراء","Al Quwa Al Jawiya":"القوة الجوية",
+"Benfica":"بنفيكا","Porto":"بورتو","FC Porto":"بورتو","Sporting CP":"سبورتينغ لشبونة","Sporting":"سبورتينغ لشبونة","Ajax":"أياكس","PSV":"آيندهوفن","PSV Eindhoven":"آيندهوفن","Feyenoord":"فينورد","Celtic":"سلتيك","Rangers":"رينجرز","Club Brugge":"كلوب بروج","Galatasaray":"غلطة سراي","Fenerbahce":"فنربخشة","Fenerbahçe":"فنربخشة","Besiktas":"بشكتاش","Shakhtar Donetsk":"شاختار دونيتسك","Red Bull Salzburg":"سالزبورغ","Salzburg":"سالزبورغ","Olympiacos":"أولمبياكوس","Dinamo Zagreb":"دينامو زغرب","Copenhagen":"كوبنهاغن","FC Copenhagen":"كوبنهاغن","Bodo/Glimt":"بودو غليمت","Qarabag":"قره باغ","Sparta Prague":"سبارتا براغ","Slavia Prague":"سلافيا براغ","Red Star Belgrade":"النجم الأحمر","Crvena Zvezda":"النجم الأحمر","Young Boys":"يونغ بويز",
+"Iraq":"العراق","Saudi Arabia":"السعودية","Qatar":"قطر","United Arab Emirates":"الإمارات","UAE":"الإمارات","Jordan":"الأردن","Kuwait":"الكويت","Bahrain":"البحرين","Oman":"عُمان","Syria":"سوريا","Lebanon":"لبنان","Palestine":"فلسطين","Egypt":"مصر","Morocco":"المغرب","Algeria":"الجزائر","Tunisia":"تونس","Libya":"ليبيا","Sudan":"السودان","Yemen":"اليمن","Iran":"إيران","Japan":"اليابان","South Korea":"كوريا الجنوبية","Korea Republic":"كوريا الجنوبية","Australia":"أستراليا","China":"الصين","China PR":"الصين","Uzbekistan":"أوزبكستان",
+"England":"إنجلترا","Spain":"إسبانيا","France":"فرنسا","Germany":"ألمانيا","Italy":"إيطاليا","Portugal":"البرتغال","Netherlands":"هولندا","Belgium":"بلجيكا","Croatia":"كرواتيا","Switzerland":"سويسرا","Denmark":"الدنمارك","Sweden":"السويد","Norway":"النرويج","Poland":"بولندا","Austria":"النمسا","Turkey":"تركيا","Türkiye":"تركيا","Scotland":"اسكتلندا","Wales":"ويلز","Republic of Ireland":"أيرلندا","Ireland":"أيرلندا","Northern Ireland":"أيرلندا الشمالية","Serbia":"صربيا","Ukraine":"أوكرانيا","Czechia":"التشيك","Czech Republic":"التشيك","Hungary":"المجر","Greece":"اليونان","Romania":"رومانيا",
+"Brazil":"البرازيل","Argentina":"الأرجنتين","Uruguay":"الأوروغواي","Colombia":"كولومبيا","Chile":"تشيلي","Mexico":"المكسيك","USA":"الولايات المتحدة","United States":"الولايات المتحدة","Canada":"كندا","Senegal":"السنغال","Nigeria":"نيجيريا","Ghana":"غانا","Cameroon":"الكاميرون","Ivory Coast":"ساحل العاج","Côte d'Ivoire":"ساحل العاج"
+};
+const norm = s => String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+const AR_IDX = {}; for(const k in TEAM_AR) AR_IDX[norm(k)] = TEAM_AR[k];
+const tname = (t, long) => {
+  if(!t) return '';
+  for(const n of [t.displayName, t.shortDisplayName, t.name, t.location]){ const a = AR_IDX[norm(n)]; if(a) return a; }
+  return long ? (t.displayName || t.shortDisplayName) : (t.shortDisplayName || t.displayName);
+};
+
+const PLAYER_AR = {
+"Lamine Yamal":"لامين يامال",
+"Robert Lewandowski":"ليفاندوفسكي",
+"Raphinha":"رافينيا",
+"Pedri":"بيدري",
+"Gavi":"غافي",
+"Frenkie de Jong":"فرينكي دي يونغ",
+"Ronald Araujo":"رونالد أراوخو",
+"Ronald Araújo":"رونالد أراوخو",
+"Jules Kounde":"كوندي",
+"Jules Koundé":"كوندي",
+"Pau Cubarsi":"باو كوبارسي",
+"Pau Cubarsí":"باو كوبارسي",
+"Alejandro Balde":"بالدي",
+"Marc-Andre ter Stegen":"تير شتيغن",
+"Marc-André ter Stegen":"تير شتيغن",
+"Joan Garcia":"جوان غارسيا",
+"Joan García":"جوان غارسيا",
+"Dani Olmo":"داني أولمو",
+"Ferran Torres":"فيران توريس",
+"Fermin Lopez":"فيرمين لوبيز",
+"Fermín López":"فيرمين لوبيز",
+"Marcus Rashford":"راشفورد",
+"Marc Casado":"مارك كاسادو",
+"Eric Garcia":"إريك غارسيا",
+"Eric García":"إريك غارسيا",
+"Andreas Christensen":"كريستنسن",
+"Wojciech Szczesny":"تشيزني",
+"Wojciech Szczęsny":"تشيزني",
+"Kylian Mbappe":"كيليان مبابي",
+"Kylian Mbappé":"كيليان مبابي",
+"Vinicius Junior":"فينيسيوس جونيور",
+"Vinícius Júnior":"فينيسيوس جونيور",
+"Jude Bellingham":"جود بيلينغهام",
+"Federico Valverde":"فالفيردي",
+"Aurelien Tchouameni":"تشواميني",
+"Aurélien Tchouaméni":"تشواميني",
+"Eduardo Camavinga":"كامافينغا",
+"Rodrygo":"رودريغو",
+"Thibaut Courtois":"كورتوا",
+"Antonio Rudiger":"روديغر",
+"Antonio Rüdiger":"روديغر",
+"Eder Militao":"ميليتاو",
+"Éder Militão":"ميليتاو",
+"Dani Carvajal":"كارفاخال",
+"Trent Alexander-Arnold":"ألكسندر أرنولد",
+"Dean Huijsen":"هاوسن",
+"Arda Guler":"أردا غولر",
+"Arda Güler":"أردا غولر",
+"Franco Mastantuono":"ماستانتونو",
+"Alvaro Carreras":"ألفارو كاريراس",
+"Álvaro Carreras":"ألفارو كاريراس",
+"Ferland Mendy":"فيرلاند ميندي",
+"Endrick":"إندريك",
+"Brahim Diaz":"إبراهيم دياز",
+"Brahim Díaz":"إبراهيم دياز",
+"Raul Asencio":"راؤول أسينسيو",
+"Raúl Asencio":"راؤول أسينسيو",
+"Antoine Griezmann":"غريزمان",
+"Julian Alvarez":"جوليان ألفاريز",
+"Julián Álvarez":"جوليان ألفاريز",
+"Jan Oblak":"يان أوبلاك",
+"Koke":"كوكي",
+"Alexander Sorloth":"سورلوث",
+"Alexander Sørloth":"سورلوث",
+"Marcos Llorente":"يورنتي",
+"Conor Gallagher":"غالاغر",
+"Giuliano Simeone":"جوليانو سيميوني",
+"Jose Gimenez":"خيمينيز",
+"José María Giménez":"خيمينيز",
+"Robin Le Normand":"لو نورماند",
+"Pablo Barrios":"بابلو باريوس",
+"Mohamed Salah":"محمد صلاح",
+"Virgil van Dijk":"فان دايك",
+"Alisson":"أليسون",
+"Alisson Becker":"أليسون",
+"Florian Wirtz":"فلوريان فيرتز",
+"Alexander Isak":"ألكسندر إيزاك",
+"Hugo Ekitike":"إيكيتيكي",
+"Hugo Ekitiké":"إيكيتيكي",
+"Cody Gakpo":"غاكبو",
+"Dominik Szoboszlai":"سوبوسلاي",
+"Alexis Mac Allister":"ماك أليستر",
+"Ryan Gravenberch":"غرافنبرخ",
+"Ibrahima Konate":"كوناتي",
+"Ibrahima Konaté":"كوناتي",
+"Federico Chiesa":"كييزا",
+"Milos Kerkez":"كيركيز",
+"Jeremie Frimpong":"فريمبونغ",
+"Curtis Jones":"كورتيس جونز",
+"Erling Haaland":"إيرلينغ هالاند",
+"Phil Foden":"فودين",
+"Rodri":"رودري",
+"Bernardo Silva":"برناردو سيلفا",
+"Ruben Dias":"روبن دياز",
+"Rúben Dias":"روبن دياز",
+"Josko Gvardiol":"غفارديول",
+"Joško Gvardiol":"غفارديول",
+"Omar Marmoush":"عمر مرموش",
+"Rayan Cherki":"ريان شرقي",
+"Tijjani Reijnders":"رايندرز",
+"Jeremy Doku":"دوكو",
+"Jérémy Doku":"دوكو",
+"Gianluigi Donnarumma":"دوناروما",
+"Savinho":"سافينيو",
+"Abdukodir Khusanov":"خوسانوف",
+"Nico O'Reilly":"أورايلي",
+"Matheus Nunes":"ماتيوس نونيز",
+"John Stones":"ستونز",
+"Bukayo Saka":"بوكايو ساكا",
+"Martin Odegaard":"أوديغارد",
+"Martin Ødegaard":"أوديغارد",
+"Declan Rice":"ديكلان رايس",
+"William Saliba":"ساليبا",
+"Gabriel":"غابرييل",
+"Gabriel Magalhaes":"غابرييل",
+"Gabriel Magalhães":"غابرييل",
+"Gabriel Martinelli":"مارتينيلي",
+"Viktor Gyokeres":"فيكتور غيوكيريس",
+"Viktor Gyökeres":"فيكتور غيوكيريس",
+"Eberechi Eze":"إيزي",
+"Martin Zubimendi":"زوبيميندي",
+"David Raya":"ديفيد رايا",
+"Leandro Trossard":"تروسار",
+"Kai Havertz":"هافيرتز",
+"Jurrien Timber":"تيمبر",
+"Jurriën Timber":"تيمبر",
+"Riccardo Calafiori":"كالافيوري",
+"Noni Madueke":"مادويكي",
+"Mikel Merino":"ميكيل ميرينو",
+"Piero Hincapie":"إنكابيي",
+"Piero Hincapié":"إنكابيي",
+"Cole Palmer":"كول بالمر",
+"Enzo Fernandez":"إنزو فرنانديز",
+"Enzo Fernández":"إنزو فرنانديز",
+"Moises Caicedo":"كايسيدو",
+"Moisés Caicedo":"كايسيدو",
+"Joao Pedro":"جواو بيدرو",
+"João Pedro":"جواو بيدرو",
+"Pedro Neto":"بيدرو نيتو",
+"Reece James":"ريس جيمس",
+"Marc Cucurella":"كوكوريا",
+"Robert Sanchez":"روبرت سانشيز",
+"Robert Sánchez":"روبرت سانشيز",
+"Liam Delap":"ديلاب",
+"Estevao":"إستيفاو",
+"Estêvão":"إستيفاو",
+"Jamie Gittens":"جيتنز",
+"Levi Colwill":"كولويل",
+"Wesley Fofana":"فوفانا",
+"Trevoh Chalobah":"تشالوبا",
+"Bruno Fernandes":"برونو فرنانديز",
+"Bryan Mbeumo":"مبيومو",
+"Matheus Cunha":"كونيا",
+"Benjamin Sesko":"شيشكو",
+"Benjamin Šeško":"شيشكو",
+"Amad Diallo":"أماد ديالو",
+"Casemiro":"كاسيميرو",
+"Kobbie Mainoo":"ماينو",
+"Lisandro Martinez":"ليساندرو مارتينيز",
+"Lisandro Martínez":"ليساندرو مارتينيز",
+"Harry Maguire":"ماغواير",
+"Leny Yoro":"يورو",
+"Diogo Dalot":"دالوت",
+"Luke Shaw":"لوك شو",
+"Matthijs de Ligt":"دي ليخت",
+"Mason Mount":"ماونت",
+"Manuel Ugarte":"أوغارتي",
+"Senne Lammens":"لامينز",
+"Andre Onana":"أونانا",
+"André Onana":"أونانا",
+"Patrick Dorgu":"دورغو",
+"Son Heung-Min":"سون هيونغ مين",
+"Heung-Min Son":"سون هيونغ مين",
+"James Maddison":"ماديسون",
+"Dejan Kulusevski":"كولوسيفسكي",
+"Richarlison":"ريتشارليسون",
+"Dominic Solanke":"سولانكي",
+"Cristian Romero":"كريستيان روميرو",
+"Micky van de Ven":"فان دي فين",
+"Guglielmo Vicario":"فيكاريو",
+"Pedro Porro":"بيدرو بورو",
+"Mohammed Kudus":"محمد قدوس",
+"Xavi Simons":"تشافي سيمونز",
+"Joao Palhinha":"بالينيا",
+"João Palhinha":"بالينيا",
+"Rodrigo Bentancur":"بينتانكور",
+"Pape Matar Sarr":"بابي سار",
+"Lucas Bergvall":"بيرغفال",
+"Brennan Johnson":"برينان جونسون",
+"Destiny Udogie":"أودوجي",
+"Randal Kolo Muani":"كولو مواني",
+"Ollie Watkins":"واتكينز",
+"Emiliano Martinez":"إيميليانو مارتينيز",
+"Emiliano Martínez":"إيميليانو مارتينيز",
+"Youri Tielemans":"تيليمانس",
+"Morgan Rogers":"مورغان روجرز",
+"Bruno Guimaraes":"برونو غيماريش",
+"Bruno Guimarães":"برونو غيماريش",
+"Anthony Gordon":"أنتوني غوردون",
+"Nick Woltemade":"فولتيمادي",
+"Sandro Tonali":"تونالي",
+"Jarrod Bowen":"بوين",
+"Morgan Gibbs-White":"غيبس وايت",
+"Chris Wood":"كريس وود",
+"Kaoru Mitoma":"ميتوما",
+"Jean-Philippe Mateta":"ماتيتا",
+"Yoane Wissa":"ويسا",
+"Antoine Semenyo":"سيمينيو",
+"Granit Xhaka":"تشاكا",
+"Jordan Pickford":"بيكفورد",
+"Jack Grealish":"غريليش",
+"Lautaro Martinez":"لاوتارو مارتينيز",
+"Lautaro Martínez":"لاوتارو مارتينيز",
+"Marcus Thuram":"ماركوس تورام",
+"Nicolo Barella":"باريلا",
+"Nicolò Barella":"باريلا",
+"Hakan Calhanoglu":"تشالهان أوغلو",
+"Hakan Çalhanoğlu":"تشالهان أوغلو",
+"Yann Sommer":"زومر",
+"Alessandro Bastoni":"باستوني",
+"Federico Dimarco":"ديماركو",
+"Denzel Dumfries":"دومفريس",
+"Henrikh Mkhitaryan":"مخيتاريان",
+"Ange-Yoan Bonny":"بوني",
+"Rafael Leao":"رافائيل لياو",
+"Rafael Leão":"رافائيل لياو",
+"Christian Pulisic":"بوليسيتش",
+"Luka Modric":"لوكا مودريتش",
+"Luka Modrić":"لوكا مودريتش",
+"Mike Maignan":"مينيان",
+"Santiago Gimenez":"سانتياغو خيمينيز",
+"Santiago Giménez":"سانتياغو خيمينيز",
+"Adrien Rabiot":"رابيو",
+"Dusan Vlahovic":"فلاهوفيتش",
+"Dušan Vlahović":"فلاهوفيتش",
+"Kenan Yildiz":"كنان يلدز",
+"Kenan Yıldız":"كنان يلدز",
+"Jonathan David":"جوناثان ديفيد",
+"Teun Koopmeiners":"كوبماينرز",
+"Gleison Bremer":"بريمر",
+"Romelu Lukaku":"لوكاكو",
+"Kevin De Bruyne":"دي بروين",
+"Scott McTominay":"ماكتوميناي",
+"Rasmus Hojlund":"هويلوند",
+"Rasmus Højlund":"هويلوند",
+"Stanislav Lobotka":"لوبوتكا",
+"Paulo Dybala":"ديبالا",
+"Artem Dovbyk":"دوفبيك",
+"Ademola Lookman":"لوكمان",
+"Mateo Retegui":"ريتيغي",
+"Moise Kean":"مويس كين",
+"Mattia Zaccagni":"زاكاني",
+"Victor Osimhen":"أوسيمين",
+"Harry Kane":"هاري كين",
+"Jamal Musiala":"موسيالا",
+"Michael Olise":"أوليسيه",
+"Joshua Kimmich":"كيميتش",
+"Manuel Neuer":"نوير",
+"Luis Diaz":"لويس دياز",
+"Luis Díaz":"لويس دياز",
+"Serge Gnabry":"غنابري",
+"Leroy Sane":"ساني",
+"Leroy Sané":"ساني",
+"Dayot Upamecano":"أوباميكانو",
+"Jonathan Tah":"يوناثان تاه",
+"Alphonso Davies":"ألفونسو ديفيز",
+"Kim Min-Jae":"كيم مين جاي",
+"Leon Goretzka":"غوريتسكا",
+"Serhou Guirassy":"غيراسي",
+"Karim Adeyemi":"أديمي",
+"Nico Schlotterbeck":"شلوتربيك",
+"Gregor Kobel":"كوبل",
+"Julian Brandt":"براندت",
+"Patrik Schick":"شيك",
+"Deniz Undav":"أونداف",
+"Ousmane Dembele":"عثمان ديمبيلي",
+"Ousmane Dembélé":"عثمان ديمبيلي",
+"Achraf Hakimi":"أشرف حكيمي",
+"Khvicha Kvaratskhelia":"كفاراتسخيليا",
+"Vitinha":"فيتينيا",
+"Joao Neves":"جواو نيفيز",
+"João Neves":"جواو نيفيز",
+"Marquinhos":"ماركينيوس",
+"Desire Doue":"ديزيريه دوي",
+"Désiré Doué":"ديزيريه دوي",
+"Bradley Barcola":"باركولا",
+"Nuno Mendes":"نونو مينديز",
+"Lucas Chevalier":"شوفالييه",
+"Fabian Ruiz":"فابيان رويز",
+"Fabián Ruiz":"فابيان رويز",
+"Warren Zaire-Emery":"زائير إيمري",
+"Goncalo Ramos":"غونسالو راموس",
+"Gonçalo Ramos":"غونسالو راموس",
+"Lee Kang-In":"لي كانغ إن",
+"Willian Pacho":"باتشو",
+"Mason Greenwood":"غرينوود",
+"Pierre-Emerick Aubameyang":"أوباميانغ",
+"Amine Gouiri":"أمين غويري",
+"Nayef Aguerd":"نايف أكرد",
+"Bilal Nadir":"بلال نادر",
+"Hamed Traore":"حامد تراوري",
+"Cristiano Ronaldo":"كريستيانو رونالدو",
+"Sadio Mane":"ساديو ماني",
+"Sadio Mané":"ساديو ماني",
+"Joao Felix":"جواو فيليكس",
+"João Félix":"جواو فيليكس",
+"Kingsley Coman":"كومان",
+"Inigo Martinez":"إينيغو مارتينيز",
+"Iñigo Martínez":"إينيغو مارتينيز",
+"Marcelo Brozovic":"بروزوفيتش",
+"Marcelo Brozović":"بروزوفيتش",
+"Bento":"بينتو",
+"Karim Benzema":"كريم بنزيما",
+"N'Golo Kante":"كانتي",
+"N'Golo Kanté":"كانتي",
+"Fabinho":"فابينيو",
+"Houssem Aouar":"حسام عوار",
+"Moussa Diaby":"موسى ديابي",
+"Steven Bergwijn":"بيرخفين",
+"Riyad Mahrez":"رياض محرز",
+"Ivan Toney":"إيفان توني",
+"Franck Kessie":"كيسيه",
+"Franck Kessié":"كيسيه",
+"Edouard Mendy":"إدوارد ميندي",
+"Édouard Mendy":"إدوارد ميندي",
+"Merih Demiral":"ديميرال",
+"Roger Ibanez":"روجر إيبانيز",
+"Roger Ibañez":"روجر إيبانيز",
+"Aleksandar Mitrovic":"ميتروفيتش",
+"Aleksandar Mitrović":"ميتروفيتش",
+"Ruben Neves":"روبن نيفيز",
+"Rúben Neves":"روبن نيفيز",
+"Joao Cancelo":"جواو كانسيلو",
+"João Cancelo":"جواو كانسيلو",
+"Kalidou Koulibaly":"كوليبالي",
+"Yassine Bounou":"ياسين بونو",
+"Sergej Milinkovic-Savic":"ميلينكوفيتش سافيتش",
+"Sergej Milinković-Savić":"ميلينكوفيتش سافيتش",
+"Malcom":"مالكوم",
+"Theo Hernandez":"ثيو هيرنانديز",
+"Theo Hernández":"ثيو هيرنانديز",
+"Darwin Nunez":"داروين نونيز",
+"Darwin Núñez":"داروين نونيز",
+"Salem Al Dawsari":"سالم الدوسري",
+"Salem Al-Dawsari":"سالم الدوسري",
+"Firas Al Buraikan":"فراس البريكان",
+"Firas Al-Buraikan":"فراس البريكان",
+"Mohamed Kanno":"محمد كنو",
+"Saud Abdulhamid":"سعود عبدالحميد",
+"Abdulrahman Ghareeb":"عبدالرحمن غريب",
+"Nawaf Al Aqidi":"نواف العقيدي",
+"Ali Al Bulayhi":"علي البليهي",
+"Hassan Tambakti":"حسان تمبكتي",
+"Julian Quinones":"جوليان كينونيس",
+"Julián Quiñones":"جوليان كينونيس",
+"Jhon Duran":"جون دوران",
+"Jhon Durán":"جون دوران",
+"Angelo Gabriel":"أنجيلو",
+"Aymen Hussein":"أيمن حسين",
+"Ali Jasim":"علي جاسم",
+"Zidane Iqbal":"زيدان إقبال",
+"Mohanad Ali":"مهند علي",
+"Jalal Hassan":"جلال حسن",
+"Amir Al-Ammari":"أمير العماري",
+"Ibrahim Bayesh":"إبراهيم بايش",
+"Akram Afif":"أكرم عفيف",
+"Almoez Ali":"المعز علي",
+"Hakim Ziyech":"حكيم زياش",
+"Youssef En-Nesyri":"يوسف النصيري",
+"Sofyan Amrabat":"سفيان أمرابط",
+"Noussair Mazraoui":"نصير مزراوي",
+"Ismael Saibari":"إسماعيل صيباري",
+"Abde Ezzalzouli":"عبد الصمد الزلزولي",
+"Bilal El Khannouss":"بلال الخنوس",
+"Eliesse Ben Seghir":"إلياس بن صغير",
+"Rayan Ait-Nouri":"ريان آيت نوري",
+"Rayan Aït-Nouri":"ريان آيت نوري",
+"Ismael Bennacer":"إسماعيل بن ناصر",
+"Mohamed Amoura":"محمد عمورة",
+"Hannibal Mejbri":"حنبعل المجبري",
+"Musa Al-Taamari":"موسى التعمري",
+"Yazan Al-Naimat":"يزن النعيمات",
+"Mostafa Mohamed":"مصطفى محمد",
+"Trezeguet":"تريزيغيه",
+"Emam Ashour":"إمام عاشور",
+"Zizo":"زيزو",
+"Lionel Messi":"ليونيل ميسي",
+"Neymar":"نيمار",
+"Luis Suarez":"لويس سواريز",
+"Luis Suárez":"لويس سواريز",
+"Son Heung-min":"سون هيونغ مين"
+};
+const PL_IDX = {}; for(const k in PLAYER_AR) PL_IDX[norm(k)] = PLAYER_AR[k];
+const pname = (a, short) => {
+  if(!a) return '';
+  const ar = PL_IDX[norm(a.displayName)] || PL_IDX[norm(a.fullName)];
+  if(ar) return ar;
+  return short ? (a.shortName || a.displayName || '') : (a.displayName || a.shortName || '');
+};
+
+// ===== التشكيلة =====
+function posGroup(p){
+  const a = String(p.position?.abbreviation || p.position?.name || '').toUpperCase();
+  if(/^G/.test(a)) return 0;
+  if(/^(D|CD|CB|LB|RB|LWB|RWB|SW)/.test(a) || /BACK|DEFEN/.test(a)) return 1;
+  if(/^(F|CF|ST|LW|RW|SS|W)/.test(a) || /FORWARD|STRIKER|WING/.test(a)) return 3;
+  return 2;
+}
+function txtColor(hex){
+  const h = String(hex||'').replace('#',''); if(h.length < 6) return '#fff';
+  const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
+  return (r*299 + g*587 + b*114)/1000 > 150 ? '#111' : '#fff';
+}
+function teamLineup(r){
+  const list = r.roster || [];
+  const starters = list.filter(p => p.starter);
+  const subs = list.filter(p => !p.starter);
+  if(!starters.length) return '';
+  const col = '#' + String(r.team?.color || '00c46a').replace('#','');
+  const tc = txtColor(col);
+  const dot = p => `<div class="pl"><i style="background:${col};color:${tc}">${esc(p.jersey ?? '')}</i><span>${esc(pname(p.athlete, true))}</span></div>`;
+  const gk = starters.filter(p => posGroup(p) === 0).slice(0,1);
+  const out = starters.filter(p => !gk.includes(p))
+    .sort((a,b) => posGroup(a) - posGroup(b) || (a.formationPlace ?? 99) - (b.formationPlace ?? 99));
+  const form = String(r.formation || '').trim();
+  const counts = /^\d(-\d)+$/.test(form) ? form.split('-').map(Number) : null;
+  let rows = [];
+  if(counts && counts.reduce((x,y) => x+y, 0) === out.length){
+    let i = 0; rows = counts.map(c => out.slice(i, i += c));
+  } else {
+    [1,2,3].forEach(g => { const rr = out.filter(p => posGroup(p) === g); if(rr.length) rows.push(rr); });
+  }
+  const pitch = `<div class="pitch"><div class="prow">${gk.map(dot).join('')}</div>${rows.map(rr => `<div class="prow">${rr.map(dot).join('')}</div>`).join('')}</div>`;
+  const subsHtml = subs.length ? `<div class="subs"><div style="border:0;color:var(--muted)">الاحتياط</div>${subs.map(p => `<div><b>${esc(p.jersey ?? '')}</b><span>${esc(pname(p.athlete))}${p.subbedIn ? ' 🔁' : ''}</span></div>`).join('')}</div>` : '';
+  return `<div class="lt"><span>${esc(tname(r.team, true))}</span>${form ? `<em>${esc(form)}</em>` : ''}</div>${pitch}${subsHtml}`;
+}
+function lineupsHTML(rosters){
+  const rs = (rosters || []).filter(r => (r.roster || []).some(p => p.starter));
+  if(!rs.length) return '';
+  rs.sort((a,b) => (a.homeAway === 'home' ? 0 : 1) - (b.homeAway === 'home' ? 0 : 1));
+  return `<div class="sec"><h3>التشكيلة والخطة</h3>
+    <div class="tabs2">${rs.map((r,i) => `<button class="${i?'':'on'}" onclick="showLU(${i},this)">${esc(tname(r.team))}</button>`).join('')}</div>
+    ${rs.map((r,i) => `<div class="lu" data-i="${i}" style="${i?'display:none':''}">${teamLineup(r)}</div>`).join('')}
+  </div>`;
+}
+function showLU(i, btn){
+  btn.parentNode.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === btn));
+  document.querySelectorAll('.lu').forEach(d => d.style.display = d.dataset.i == i ? '' : 'none');
+}
+
+// ===== المعلق (حسب الدوري) — الـ API ما يعطي المعلق، اكتبه هنا إذا تريد =====
+const COMMENTATORS = {};
+
+// ===== القنوات الناقلة بالمنطقة العربية (حسب الدوري) — عدّلها براحتك =====
+const CHANNELS = {
+  'uefa.champions':'beIN SPORTS',
+  'eng.1':'beIN SPORTS',
+  'esp.1':'beIN SPORTS'
+};
+
+
+
+const state = {date:new Date(), league:'all', view:'matches', liveOnly:false};
+const $ = id => document.getElementById(id);
+const main = $('main');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ymd = d => d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+const isoDay = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const sameDay = (a,b) => ymd(a) === ymd(b);
+const spinner = '<div class="spin"></div>';
+const img = (src, cls='') => src ? `<img src="${esc(src)}" class="${cls}" loading="lazy" onerror="this.style.visibility='hidden'">` : '<img style="visibility:hidden">';
+
+async function getJSON(url){
+  const r = await fetch(url);
+  if(!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+
+// ===== شريط التاريخ والدوريات =====
+function drawDate(){
+  const t = new Date(), y = new Date(); y.setDate(t.getDate()-1);
+  const tm = new Date(); tm.setDate(t.getDate()+1);
+  let label = state.date.toLocaleDateString('ar', {weekday:'long', day:'numeric', month:'long'});
+  if(sameDay(state.date,t)) label = 'اليوم';
+  else if(sameDay(state.date,y)) label = 'أمس';
+  else if(sameDay(state.date,tm)) label = 'غداً';
+  $('todayBtn').textContent = label;
+  $('pick').value = isoDay(state.date);
+  $('dates').style.display = state.view === 'matches' ? 'flex' : 'none';
+  $('liveBtn').style.display = state.view === 'matches' ? '' : 'none';
+}
+function drawChips(){
+  const list = state.view === 'matches' ? [{id:'all', n:'الكل'}, ...LEAGUES] : LEAGUES;
+  if(state.view === 'table' && state.league === 'all') state.league = LEAGUES[1].id;
+  $('chips').innerHTML = list.map(l => `<button class="chip ${l.id===state.league?'on':''}" data-id="${l.id}">${l.n}</button>`).join('');
+}
+$('chips').onclick = e => { const b = e.target.closest('.chip'); if(!b) return; state.league = b.dataset.id; drawChips(); load(); };
+const shift = n => { state.date.setDate(state.date.getDate()+n); drawDate(); load(); };
+$('prev').onclick = () => shift(-1);
+$('next').onclick = () => shift(1);
+$('todayBtn').onclick = () => { state.date = new Date(); drawDate(); load(); };
+$('pick').onchange = e => { if(!e.target.value) return; const [y,m,d] = e.target.value.split('-'); state.date = new Date(y, m-1, d); drawDate(); load(); };
+$('liveBtn').onclick = () => { state.liveOnly = !state.liveOnly; $('liveBtn').classList.toggle('on', state.liveOnly); load(); };
+document.querySelector('nav').onclick = e => {
+  const b = e.target.closest('button'); if(!b) return;
+  state.view = b.dataset.v;
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
+  if(state.view === 'matches') state.league = 'all';
+  drawChips(); drawDate(); load();
+};
+
+function load(silent){ state.view === 'matches' ? loadMatches(silent) : loadTable(); }
+
+// ===== المباريات =====
+async function loadMatches(silent){
+  if(!silent) main.innerHTML = spinner;
+  const list = state.league === 'all' ? LEAGUES : LEAGUES.filter(l => l.id === state.league);
+  const res = await Promise.allSettled(list.map(l =>
+    getJSON(`${API}${l.id}/scoreboard?dates=${ymd(state.date)}`).then(d => ({l, logo:d.leagues?.[0]?.logos?.[0]?.href, ev:d.events || []}))
+  ));
+  if(state.view !== 'matches') return;
+  if(res.every(r => r.status === 'rejected')){
+    main.innerHTML = '<div class="msg">تعذّر الاتصال بالخادم 😕<br>تأكد من الإنترنت وحاول مرة ثانية<br><br><button class="livebtn" onclick="load()">إعادة المحاولة</button></div>';
+    return;
+  }
+  let groups = res.filter(r => r.status === 'fulfilled').map(r => r.value);
+  if(state.liveOnly) groups = groups.map(g => ({...g, ev:g.ev.filter(e => e.status?.type?.state === 'in')}));
+  groups = groups.filter(g => g.ev.length);
+  if(!groups.length){
+    main.innerHTML = `<div class="msg">${state.liveOnly ? 'ماكو مباريات مباشرة هسه' : 'ماكو مباريات بهذا اليوم'}</div>`;
+    return;
+  }
+  main.innerHTML = groups.map(g => `
+    <div class="group">
+      <div class="ghead">${g.logo ? img(g.logo) : ''}${esc(g.l.n)}</div>
+      ${g.ev.sort((a,b) => new Date(a.date) - new Date(b.date)).map(e => matchRow(e, g.l.id)).join('')}
+    </div>`).join('') + `<div class="upd">آخر تحديث ${new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</div>`;
+}
+
+function matchRow(e, lid){
+  const c = e.competitions?.[0] || {};
+  const home = c.competitors?.find(x => x.homeAway === 'home') || {};
+  const away = c.competitors?.find(x => x.homeAway === 'away') || {};
+  const st = e.status?.type?.state;
+  let mid;
+  if(st === 'pre'){
+    const t = new Date(e.date).toLocaleTimeString('ar', {hour:'2-digit', minute:'2-digit'});
+    mid = `<div class="time">${t}</div><div class="st">${e.status?.type?.detail?.includes('Postponed') ? 'مؤجلة' : ''}</div>`;
+  } else {
+    const lbl = st === 'in' ? (e.status?.type?.shortDetail === 'HT' ? 'استراحة' : esc(e.status?.displayClock || 'مباشر')) : 'انتهت';
+    mid = `<div class="score"><span>${esc(home.score)}</span><span>-</span><span>${esc(away.score)}</span></div><div class="st ${st==='in'?'live':''}">${lbl}</div>`;
+  }
+  const team = (t, side) => `<div class="team ${side} ${t.winner?'win':''}">${img(t.team?.logo)}<span>${esc(tname(t.team))}</span></div>`;
+  return `<div class="match" data-l="${lid}" data-e="${e.id}">${team(home,'home')}<div class="mid">${mid}</div>${team(away,'away')}</div>`;
+}
+main.addEventListener('click', e => { const m = e.target.closest('.match'); if(m) openMatch(m.dataset.l, m.dataset.e); });
+
+// ===== تفاصيل المباراة =====
+const STATS = {possessionPct:'الاستحواذ %', totalShots:'التسديدات', shotsOnTarget:'على المرمى', wonCorners:'الركنيات', foulsCommitted:'الأخطاء', offsides:'التسلل', yellowCards:'بطاقات صفراء', redCards:'بطاقات حمراء'};
+async function openMatch(lid, eid){
+  const panel = $('panel');
+  $('sheet').classList.add('show');
+  panel.innerHTML = '<button class="close" onclick="closeSheet()">✕</button>' + spinner;
+  try{
+    const d = await getJSON(`${API}${lid}/summary?event=${eid}`);
+    const c = d.header?.competitions?.[0] || {};
+    const home = c.competitors?.find(x => x.homeAway === 'home') || {};
+    const away = c.competitors?.find(x => x.homeAway === 'away') || {};
+    const st = c.status?.type?.state;
+    const center = st === 'pre'
+      ? `<div class="time">${new Date(c.date).toLocaleString('ar',{weekday:'short',hour:'2-digit',minute:'2-digit'})}</div>`
+      : `<div class="big"><span>${esc(home.score)}</span><span>-</span><span>${esc(away.score)}</span></div><div class="st ${st==='in'?'live':''}">${st==='in' ? esc(c.status?.displayClock) : 'انتهت'}</div>`;
+    let html = `<button class="close" onclick="closeSheet()">✕</button>
+      <div class="mh">
+        <div>${img(home.team?.logos?.[0]?.href || home.team?.logo)}<div class="nm">${esc(tname(home.team, true))}</div></div>
+        <div>${center}</div>
+        <div>${img(away.team?.logos?.[0]?.href || away.team?.logo)}<div class="nm">${esc(tname(away.team, true))}</div></div>
+      </div>`;
+
+
+    // معلومات المباراة
+    const gi = d.gameInfo || {};
+    const venue = gi.venue?.fullName || c.venue?.fullName;
+    const city = [gi.venue?.address?.city, gi.venue?.address?.country].filter(Boolean).join('، ');
+    const ref = (gi.officials || []).find(o => /referee/i.test(o.position?.name || o.position?.displayName || '') || o.order === 1) || (gi.officials || [])[0];
+    const intl = [...new Set([...(d.broadcasts || []), ...(c.broadcasts || [])].map(b => b.media?.shortName || b.names?.[0]).filter(Boolean))];
+    const rows0 = [
+      ['📺 القناة الناقلة', CHANNELS[lid] || ''],
+      ['🌍 قنوات عالمية', intl.slice(0,4).join('، ')],
+      ['🎙️ المعلق', COMMENTATORS[lid] || ''],
+      ['🏟️ الملعب', venue],
+      ['📍 المدينة', city],
+      ['🧑‍⚖️ الحكم', ref?.fullName || ref?.displayName],
+      ['👥 الحضور', gi.attendance ? Number(gi.attendance).toLocaleString('ar') : '']
+    ].filter(r => r[1]);
+    if(rows0.length) html += `<div class="sec"><h3>معلومات المباراة</h3>${rows0.map(r => `<div class="info"><span>${r[0]}</span><b>${esc(r[1])}</b></div>`).join('')}</div>`;
+
+    // التشكيلة
+    const lu = lineupsHTML(d.rosters);
+    html += lu || `<div class="sec"><h3>التشكيلة والخطة</h3><div class="msg" style="padding:14px">${st === 'pre' ? 'التشكيلة تنزل قبل المباراة بساعة تقريباً' : 'التشكيلة غير متوفرة لهذي المباراة'}</div></div>`;
+
+    // الأحداث
+    const evs = (d.keyEvents || []).map(k => {
+      const t = (k.type?.text || '').toLowerCase();
+      let ic = t.includes('own goal') ? '⚽ (ع.م)' : t.includes('goal') || t.includes('penalty - scored') ? '⚽' : t.includes('yellow') ? '🟨' : t.includes('red') ? '🟥' : t.includes('substitution') ? '🔁' : null;
+      if(!ic) return '';
+      const who = k.participants?.map(p => pname(p.athlete)).filter(Boolean).join(' ← ') || k.shortText || '';
+      const side = k.team?.id === away.team?.id ? 'a' : '';
+      return `<div class="ev ${side}"><span class="min">${esc(k.clock?.displayValue)}</span><span>${ic}</span><span>${esc(who)}</span></div>`;
+    }).join('');
+    if(evs) html += `<div class="sec"><h3>الأحداث</h3>${evs}</div>`;
+
+    // الإحصائيات
+    const bt = d.boxscore?.teams || [];
+    const hs = bt.find(t => t.team?.id === home.team?.id)?.statistics || [];
+    const as = bt.find(t => t.team?.id === away.team?.id)?.statistics || [];
+    const rows = Object.entries(STATS).map(([k, lbl]) => {
+      const h = hs.find(s => s.name === k), a = as.find(s => s.name === k);
+      if(!h || !a) return '';
+      const hv = parseFloat(h.displayValue) || 0, av = parseFloat(a.displayValue) || 0, tot = hv + av || 1;
+      return `<div class="stat"><div class="row"><b>${esc(h.displayValue)}</b><span>${lbl}</span><b>${esc(a.displayValue)}</b></div>
+        <div class="bar"><i style="width:${hv/tot*100}%"></i><i class="b" style="width:${av/tot*100}%"></i></div></div>`;
+    }).join('');
+    if(rows) html += `<div class="sec"><h3>الإحصائيات</h3>${rows}</div>`;
+
+    if(false) html += '<div class="msg">التفاصيل تظهر أول ما تبدي المباراة</div>';
+    panel.innerHTML = html;
+  }catch(err){
+    panel.innerHTML = '<button class="close" onclick="closeSheet()">✕</button><div class="msg">ما گدرت أجيب التفاصيل</div>';
+  }
+}
+function closeSheet(){ $('sheet').classList.remove('show'); }
+$('sheet').onclick = e => { if(e.target.id === 'sheet') closeSheet(); };
+
+// ===== جدول الترتيب =====
+async function loadTable(){
+  main.innerHTML = spinner;
+  try{
+    const d = await getJSON(`${API_TABLE}${state.league}/standings`);
+    const blocks = d.children?.length ? d.children : [d];
+    const out = blocks.map(b => {
+      const entries = b.standings?.entries || [];
+      if(!entries.length) return '';
+      const sv = (e, n) => e.stats?.find(s => s.name === n);
+      entries.sort((x,y) => (sv(x,'rank')?.value ?? 99) - (sv(y,'rank')?.value ?? 99) || (sv(y,'points')?.value ?? 0) - (sv(x,'points')?.value ?? 0));
+      return `<div class="group">${blocks.length > 1 ? `<div class="ghead">${esc(b.name)}</div>` : ''}
+        <table><tr><th>#</th><th style="text-align:right">الفريق</th><th>لعب</th><th>ف</th><th>ت</th><th>خ</th><th>+/-</th><th>نقاط</th></tr>
+        ${entries.map((e,i) => `<tr><td>${sv(e,'rank')?.displayValue || i+1}</td>
+          <td class="tn">${img(e.team?.logos?.[0]?.href)}${esc(tname(e.team))}</td>
+          <td>${sv(e,'gamesPlayed')?.displayValue ?? '-'}</td><td>${sv(e,'wins')?.displayValue ?? '-'}</td>
+          <td>${sv(e,'ties')?.displayValue ?? '-'}</td><td>${sv(e,'losses')?.displayValue ?? '-'}</td>
+          <td style="direction:ltr">${sv(e,'pointDifferential')?.displayValue ?? '-'}</td>
+          <td class="pts">${sv(e,'points')?.displayValue ?? '-'}</td></tr>`).join('')}
+        </table></div>`;
+    }).join('');
+    if(state.view !== 'table') return;
+    main.innerHTML = out || '<div class="msg">ماكو جدول ترتيب لهذي البطولة</div>';
+  }catch(err){
+    main.innerHTML = '<div class="msg">تعذّر تحميل الترتيب 😕</div>';
+  }
+}
+
+// ===== تحديث تلقائي للمباريات المباشرة =====
+setInterval(() => {
+  if(state.view === 'matches' && sameDay(state.date, new Date()) && !document.hidden) loadMatches(true);
+}, REFRESH_SEC * 1000);
+
+drawChips(); drawDate(); load();
+if('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

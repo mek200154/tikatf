@@ -1,0 +1,27 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'com.football24.app'
+    compileSdk 34
+    defaultConfig {
+        applicationId "com.football24.app"
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+    signingConfigs {
+        release {
+            storeFile file('football24.keystore')
+            storePassword 'football24key'
+            keyAlias 'football24'
+            keyPassword 'football24key'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}
