@@ -638,7 +638,7 @@ const spinner = '<div class="spin"></div>';
 const img = (src, cls='') => src ? `<img src="${esc(src)}" class="${cls}" loading="lazy" onerror="this.style.visibility='hidden'">` : '<img style="visibility:hidden">';
 
 async function getJSON(url){
-  const r = await fetch(url);
+  const r = await fetch(url + (url.includes('?') ? '&' : '?') + '_=' + Date.now(), {cache:'no-store'});
   if(!r.ok) throw new Error('HTTP ' + r.status);
   return r.json();
 }
@@ -724,10 +724,16 @@ main.addEventListener('click', e => { const m = e.target.closest('.match'); if(m
 
 // ===== تفاصيل المباراة =====
 const STATS = {possessionPct:'الاستحواذ %', totalShots:'التسديدات', shotsOnTarget:'على المرمى', wonCorners:'الركنيات', foulsCommitted:'الأخطاء', offsides:'التسلل', yellowCards:'بطاقات صفراء', redCards:'بطاقات حمراء'};
-async function openMatch(lid, eid){
+let openNow = null; // المباراة المفتوحة حالياً
+async function openMatch(lid, eid, silent){
   const panel = $('panel');
-  $('sheet').classList.add('show');
-  panel.innerHTML = '<button class="close" onclick="closeSheet()">✕</button>' + spinner;
+  openNow = {lid, eid};
+  const keepScroll = panel.scrollTop;
+  const keepTab = [...document.querySelectorAll('.tabs2 button')].findIndex(b => b.classList.contains('on'));
+  if(!silent){
+    $('sheet').classList.add('show');
+    panel.innerHTML = '<button class="close" onclick="closeSheet()">✕</button>' + spinner;
+  }
   try{
     const d = await getJSON(`${API}${lid}/summary?event=${eid}`);
     const c = d.header?.competitions?.[0] || {};
@@ -791,12 +797,18 @@ async function openMatch(lid, eid){
     if(rows) html += `<div class="sec"><h3>الإحصائيات</h3>${rows}</div>`;
 
     if(false) html += '<div class="msg">التفاصيل تظهر أول ما تبدي المباراة</div>';
+    if(!openNow || openNow.eid !== eid) return; // انسدت أو انفتحت مباراة ثانية
     panel.innerHTML = html;
+    if(silent){
+      if(keepTab > 0){ const b = document.querySelectorAll('.tabs2 button')[keepTab]; if(b) showLU(keepTab, b); }
+      panel.scrollTop = keepScroll;
+    }
   }catch(err){
+    if(silent) return; // إذا فشل التحديث، خلي الموجود
     panel.innerHTML = '<button class="close" onclick="closeSheet()">✕</button><div class="msg">ما گدرت أجيب التفاصيل</div>';
   }
 }
-function closeSheet(){ $('sheet').classList.remove('show'); }
+function closeSheet(){ $('sheet').classList.remove('show'); openNow = null; }
 $('sheet').onclick = e => { if(e.target.id === 'sheet') closeSheet(); };
 
 // ===== جدول الترتيب =====
@@ -828,9 +840,13 @@ async function loadTable(){
 }
 
 // ===== تحديث تلقائي للمباريات المباشرة =====
-setInterval(() => {
-  if(state.view === 'matches' && sameDay(state.date, new Date()) && !document.hidden) loadMatches(true);
-}, REFRESH_SEC * 1000);
+function refreshLive(){
+  if(document.hidden) return;
+  if(state.view === 'matches' && sameDay(state.date, new Date())) loadMatches(true);
+  if(openNow) openMatch(openNow.lid, openNow.eid, true);
+}
+setInterval(refreshLive, REFRESH_SEC * 1000);
+document.addEventListener('visibilitychange', () => { if(!document.hidden) refreshLive(); });
 
 drawChips(); drawDate(); load();
 if('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(()=>{});
