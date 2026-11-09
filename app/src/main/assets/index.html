@@ -1,130 +1,340 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-theme="dark">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Football 24</title>
 <meta name="application-name" content="Football 24">
 <meta name="apple-mobile-web-app-title" content="Football 24">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0d1016">
+<meta name="theme-color" content="#0a0d12">
 <meta name="author" content="Mohammed Eyd Kadher">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script>
+// يطبّق الوضع (نهاري/ليلي) قبل ما تنرسم الصفحة حتى ما يرمش
+(function(){var t;try{t=JSON.parse(localStorage.getItem('f24.theme'))}catch(e){}
+if(!t)t=window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';
+document.documentElement.setAttribute('data-theme',t)})();
+</script>
 <style>
-:root{--bg:#0d1016;--card:#161a23;--card2:#1e2330;--text:#e9ebf1;--muted:#8a93a6;--acc:#00c46a;--live:#ff3d3d;--line:#252b38}
+/* ================= الألوان (ليلي / نهاري) ================= */
+:root,[data-theme="dark"]{
+  --bg:#0a0d12; --bg-blur:rgba(10,13,18,.82);
+  --card:#131821; --card-2:#1a2030; --card-3:#222a3b;
+  --line:rgba(255,255,255,.07); --line-2:rgba(255,255,255,.12);
+  --text:#eef1f6; --muted:#8c95a8; --faint:#5d6679;
+  --acc:#1fd17a; --acc-2:#13b866; --acc-soft:rgba(31,209,122,.14); --acc-ink:#03140b;
+  --away:#5b8cff; --away-soft:rgba(91,140,255,.16);
+  --live:#ff4757; --live-soft:rgba(255,71,87,.14);
+  --gold:#ffc53d;
+  --shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 8px 24px rgba(0,0,0,.25);
+  --pitch-a:#0f5a35; --pitch-b:#0d5130; --pitch-line:rgba(255,255,255,.28);
+  color-scheme:dark;
+}
+[data-theme="light"]{
+  --bg:#f2f4f8; --bg-blur:rgba(242,244,248,.85);
+  --card:#ffffff; --card-2:#f1f3f8; --card-3:#e6eaf2;
+  --line:rgba(16,24,40,.07); --line-2:rgba(16,24,40,.12);
+  --text:#121826; --muted:#667085; --faint:#98a2b3;
+  --acc:#0fae62; --acc-2:#0a9654; --acc-soft:rgba(15,174,98,.12); --acc-ink:#ffffff;
+  --away:#3b6cf0; --away-soft:rgba(59,108,240,.12);
+  --live:#e5283a; --live-soft:rgba(229,40,58,.1);
+  --gold:#f0a500;
+  --shadow:0 1px 2px rgba(16,24,40,.04), 0 6px 20px rgba(16,24,40,.06);
+  --pitch-a:#1f8a52; --pitch-b:#1c7f4b; --pitch-line:rgba(255,255,255,.5);
+  color-scheme:light;
+}
+
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:system-ui,"Segoe UI",Tahoma,sans-serif;max-width:760px;margin:auto;padding-bottom:90px;-webkit-tap-highlight-color:transparent}
-header{position:sticky;top:0;background:var(--bg);z-index:5;padding:12px 16px 8px;border-bottom:1px solid var(--line)}
-.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.logo{font-weight:800;font-size:20px}.logo span{color:var(--acc)}
-.livebtn{background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:20px;padding:6px 12px;font-size:13px;cursor:pointer}
-.livebtn.on{background:var(--live);border-color:var(--live)}
-.dates{display:flex;gap:6px;align-items:center;margin-bottom:10px}
-.dates button{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:7px 12px;cursor:pointer;font-size:14px}
-.dates .today{flex:1;font-weight:600}
-.dates input{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:6px;font-size:13px;color-scheme:dark;width:130px}
-.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
-.chips::-webkit-scrollbar{display:none}
-.chip{white-space:nowrap;background:var(--card);border:1px solid var(--line);color:var(--muted);border-radius:18px;padding:6px 12px;font-size:13px;cursor:pointer}
-.chip.on{background:var(--acc);border-color:var(--acc);color:#04130b;font-weight:700}
-main{padding:12px 16px}
-.group{background:var(--card);border-radius:14px;margin-bottom:12px;overflow:hidden}
-.ghead{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card2);font-weight:700;font-size:14px}
-.ghead img{width:20px;height:20px;object-fit:contain}
-.match{display:grid;grid-template-columns:1fr 84px 1fr;align-items:center;padding:12px 14px;border-top:1px solid var(--line);cursor:pointer;gap:6px}
-.match:hover{background:#1a1f2a}
-.team{display:flex;align-items:center;gap:8px;font-size:14px;min-width:0}
-.team.away{flex-direction:row-reverse;text-align:left}
-.team img{width:26px;height:26px;object-fit:contain;flex-shrink:0}
-.team span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.team.win span{font-weight:700}
-.mid{text-align:center}
-.score{font-size:19px;font-weight:800;display:flex;justify-content:center;gap:7px;direction:rtl}
-.time{font-size:15px;font-weight:600}
-.st{font-size:11px;color:var(--muted);margin-top:2px}
-.st.live{color:var(--live);font-weight:700;animation:blink 1.4s infinite}
-@keyframes blink{50%{opacity:.45}}
-.msg{text-align:center;color:var(--muted);padding:50px 10px;line-height:1.8}
-.spin{width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--acc);border-radius:50%;margin:60px auto;animation:r .8s linear infinite}
-@keyframes r{to{transform:rotate(360deg)}}
-nav{display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:3px;margin-bottom:10px;gap:3px}
-nav button{flex:1;background:none;border:0;color:var(--muted);padding:8px 0;font-size:14px;cursor:pointer;border-radius:9px;font-weight:600}
-nav button b{font-weight:400;margin-left:5px}
-nav button.on{background:var(--acc);color:#04130b}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{color:var(--muted);font-weight:500;padding:8px 4px;text-align:center}
-td{padding:9px 4px;text-align:center;border-top:1px solid var(--line)}
-td.tn{text-align:right;display:flex;align-items:center;gap:7px}
-td.tn img{width:20px;height:20px;object-fit:contain}
-td.pts{font-weight:800;color:var(--acc)}
-.sheet{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10;display:none;align-items:flex-end;justify-content:center}
-.sheet.show{display:flex}
-.panel{background:var(--bg);width:100%;max-width:760px;max-height:90vh;overflow-y:auto;border-radius:18px 18px 0 0;padding:16px}
-.close{background:var(--card2);border:0;color:var(--text);border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer}
-.mh{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;text-align:center;padding:14px 0 18px;gap:8px}
-.mh img{width:56px;height:56px;object-fit:contain}
-.mh .nm{font-size:14px;font-weight:600;margin-top:6px}
-.mh .big{font-size:34px;font-weight:800;display:flex;justify-content:center;gap:10px;direction:rtl}
-.sec{background:var(--card);border-radius:14px;padding:12px 14px;margin-bottom:12px}
-.sec h3{font-size:14px;margin-bottom:10px;color:var(--muted)}
-.ev{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:14px}
-.ev.a{flex-direction:row-reverse;text-align:left}
-.ev .min{color:var(--muted);font-size:12px;width:38px;text-align:center;direction:ltr}
-.stat{margin-bottom:12px}
-.stat .row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
-.bar{display:flex;height:6px;border-radius:4px;overflow:hidden;background:var(--card2);gap:3px}
-.bar i{display:block;background:var(--acc);border-radius:4px}
-.bar i.b{background:#5b8cff}
-footer{text-align:center;color:var(--muted);font-size:12px;padding:18px 16px 8px;line-height:1.7}
-.info{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
-.info:first-of-type{border-top:0}
-.info span{color:var(--muted);white-space:nowrap}
-.info b{font-weight:600;text-align:left}
-.pitch{background:repeating-linear-gradient(#0e5a34 0 34px,#0c5130 34px 68px);border:2px solid #2a8a57;border-radius:12px;padding:14px 2px;display:flex;flex-direction:column-reverse;gap:16px;position:relative;overflow:hidden}
-.pitch:before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:#2a8a57}
-.prow{display:flex;justify-content:space-around;position:relative}
-.pl{display:flex;flex-direction:column;align-items:center;width:66px;font-size:11px;text-align:center}
-.pl i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:12px;border:2px solid #fff;box-shadow:0 2px 4px #0006}
-.pl span{margin-top:4px;line-height:1.25;max-width:66px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 2px #000}
-.lt{display:flex;align-items:center;justify-content:space-between;margin:4px 0 8px;font-weight:700;font-size:14px}
-.lt em{font-style:normal;color:var(--acc);direction:ltr}
-.subs{margin-top:8px;font-size:13px}
-.subs div{display:flex;gap:8px;padding:5px 0;border-top:1px solid var(--line)}
-.subs b{width:24px;color:var(--muted);text-align:center}
-.tabs2{display:flex;gap:6px;margin-bottom:10px}
-.tabs2 button{flex:1;background:var(--card2);border:1px solid var(--line);color:var(--muted);border-radius:9px;padding:7px;font-size:13px;cursor:pointer}
-.tabs2 button.on{background:var(--acc);color:#04130b;font-weight:700;border-color:var(--acc)}
-.upd{font-size:11px;color:var(--muted);text-align:center;margin-top:4px}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font-family:"Readex Pro",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;
+  max-width:720px;margin:auto;min-height:100vh;padding-bottom:calc(90px + env(safe-area-inset-bottom));
+  -webkit-tap-highlight-color:transparent;transition:background .25s,color .25s;font-feature-settings:"tnum"}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+img{display:block}
+svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+svg.sf{fill:currentColor}
+.num{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+
+/* ================= الهيدر ================= */
+header{position:sticky;top:0;z-index:20;background:var(--bg-blur);backdrop-filter:saturate(1.6) blur(16px);-webkit-backdrop-filter:saturate(1.6) blur(16px);
+  padding:calc(10px + env(safe-area-inset-top)) 16px 0;border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;height:44px}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:20px;letter-spacing:-.2px;direction:ltr}
+.brand .ball{width:32px;height:32px;border-radius:10px;background:linear-gradient(145deg,var(--acc),var(--acc-2));display:grid;place-items:center;box-shadow:0 4px 14px var(--acc-soft)}
+.brand .ball svg{width:20px;height:20px}
+.brand b{color:var(--acc);font-weight:700}
+.acts{display:flex;gap:6px}
+.ib{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--card);border:1px solid var(--line);color:var(--text);transition:transform .15s,background .2s}
+.ib:active{transform:scale(.92)}
+.ib.on{background:var(--acc);color:var(--acc-ink);border-color:transparent}
+
+.search{display:none;margin:8px 0 2px;position:relative}
+.search.show{display:block}
+.search input{width:100%;height:44px;border-radius:14px;border:1px solid var(--line-2);background:var(--card);color:var(--text);font:inherit;font-size:15px;padding:0 42px 0 14px;outline:none}
+.search input:focus{border-color:var(--acc)}
+.search svg{position:absolute;right:13px;top:12px;color:var(--muted)}
+
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px;margin:10px 0 0;gap:4px}
+.seg button{flex:1;height:36px;border-radius:10px;font-size:14px;font-weight:500;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:7px;transition:all .2s}
+.seg button svg{width:17px;height:17px}
+.seg button.on{background:var(--acc);color:var(--acc-ink);font-weight:600;box-shadow:0 4px 12px var(--acc-soft)}
+
+.days{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:12px 0 2px;margin:0 -16px;padding-inline:16px;scroll-snap-type:x proximity}
+.days::-webkit-scrollbar,.chips::-webkit-scrollbar,.tabs::-webkit-scrollbar{display:none}
+.day{flex:0 0 auto;min-width:56px;height:56px;border-radius:14px;background:var(--card);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;scroll-snap-align:center;transition:all .2s}
+.day small{font-size:11px;color:var(--muted)}
+.day b{font-size:17px;font-weight:600}
+.day.on{background:var(--text);color:var(--bg);border-color:transparent}
+.day.on small{color:inherit;opacity:.7}
+.day.cal{min-width:48px;color:var(--muted);position:relative}
+.day.cal input{position:absolute;inset:0;opacity:0;width:100%;height:100%}
+
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:10px 16px 12px;margin:0 -16px}
+.chip{flex:0 0 auto;height:34px;padding:0 13px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-size:13px;font-weight:500;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:all .2s}
+.chip img{width:16px;height:16px;object-fit:contain}
+.chip.on{background:var(--acc-soft);border-color:var(--acc);color:var(--acc)}
+.chip .dot{width:7px;height:7px;border-radius:50%;background:var(--live);box-shadow:0 0 0 3px var(--live-soft)}
+.chip .cnt{background:var(--live);color:#fff;border-radius:999px;font-size:11px;padding:1px 7px;font-weight:600}
+.chip svg{width:15px;height:15px}
+
+/* ================= قائمة المباريات ================= */
+main{padding:14px 16px}
+.sec-t{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--muted);margin:6px 4px 10px}
+.sec-t svg{width:16px;height:16px;color:var(--gold);fill:var(--gold);stroke:var(--gold)}
+.group{background:var(--card);border:1px solid var(--line);border-radius:20px;margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow);animation:up .35s ease both}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.gh{width:100%;display:flex;align-items:center;gap:10px;padding:13px 16px;font-weight:600;font-size:14px;text-align:right}
+.gh .gl{width:26px;height:26px;border-radius:8px;background:#fff;display:grid;place-items:center;padding:3px;flex-shrink:0}
+.gh .gl img{width:100%;height:100%;object-fit:contain}
+.gh .gc{margin-inline-start:auto;color:var(--faint);font-size:12px;font-weight:500;display:flex;align-items:center;gap:4px}
+.gh .gc svg{width:15px;height:15px}
+
+.m{position:relative;width:100%;display:grid;grid-template-columns:1fr 84px 1fr;align-items:center;gap:8px;padding:14px 16px;border-top:1px solid var(--line);text-align:right;transition:background .15s}
+.m:active{background:var(--card-2)}
+.m.is-fav::before{content:"";position:absolute;inset-block:12px;right:0;width:3px;border-radius:3px 0 0 3px;background:var(--gold)}
+.t{display:flex;align-items:center;gap:9px;min-width:0;font-size:14px;font-weight:500}
+.t.a{flex-direction:row-reverse;text-align:left}
+.t span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t.win span{font-weight:700}
+.t.lose span{color:var(--muted)}
+.lg{width:30px;height:30px;object-fit:contain;flex-shrink:0}
+.lg.ph{border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff}
+svg.fs{width:13px;height:13px;color:var(--gold);fill:var(--gold);stroke:var(--gold);flex-shrink:0;margin-inline-start:-4px}
+.c{display:flex;flex-direction:column;align-items:center;gap:5px}
+.sc{display:flex;align-items:center;gap:8px;font-size:21px;font-weight:700;direction:rtl}
+.sc i{font-style:normal;color:var(--faint);font-weight:400;font-size:16px}
+.sc small{font-size:11px;color:var(--muted);font-weight:500}
+.tm{font-size:16px;font-weight:600}
+.pill{font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--card-2);color:var(--muted);white-space:nowrap}
+.pill.live{background:var(--live-soft);color:var(--live);display:flex;align-items:center;gap:5px}
+.pill.live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--live);animation:pulse 1.3s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 var(--live)}70%{box-shadow:0 0 0 6px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.prog{position:absolute;bottom:0;right:0;height:2px;width:var(--p);background:linear-gradient(90deg,transparent,var(--live));border-radius:2px}
+
+.empty{text-align:center;color:var(--muted);padding:56px 20px;line-height:1.9;font-size:14px}
+.empty .ill{width:72px;height:72px;margin:0 auto 14px;border-radius:24px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;color:var(--faint)}
+.empty .ill svg{width:34px;height:34px}
+.empty .btn{margin-top:14px}
+.btn{height:42px;padding:0 18px;border-radius:12px;background:var(--acc);color:var(--acc-ink);font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:8px}
+.btn.ghost{background:var(--card-2);color:var(--text)}
+.upd{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:var(--faint);margin:4px 0 0}
+.upd svg{width:13px;height:13px}
+
+.sk{height:64px;border-top:1px solid var(--line);position:relative;overflow:hidden}
+.sk:first-child{border:0;height:52px}
+.sk::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,var(--card-2),transparent);animation:sh 1.2s infinite}
+@keyframes sh{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+
+/* ================= الترتيب ================= */
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{color:var(--faint);font-weight:500;font-size:11px;padding:10px 4px;text-align:center}
+.tbl td{padding:10px 4px;text-align:center;border-top:1px solid var(--line)}
+.tbl td.tn{text-align:right}
+.tbl td.tn div{display:flex;align-items:center;gap:9px;font-weight:500}
+.tbl td.tn img,.tbl td.tn .lg{width:22px;height:22px}
+.tbl .rk{position:relative;width:34px;font-weight:600;color:var(--muted)}
+.tbl .rk i{position:absolute;right:0;top:8px;bottom:8px;width:3px;border-radius:3px 0 0 3px}
+.tbl .pts{font-weight:700;color:var(--text)}
+.tbl tr.fav td{background:var(--acc-soft)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 14px;padding:12px 16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:3px}
+
+footer{text-align:center;color:var(--faint);font-size:12px;padding:22px 16px 8px}
+
+/* ================= نافذة المباراة ================= */
+.sheet{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .25s}
+.sheet.show{opacity:1;pointer-events:auto}
+.panel{position:absolute;inset:0;top:0;max-width:720px;margin:auto;background:var(--bg);overflow-y:auto;overscroll-behavior:contain;transform:translateY(100%);transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.sheet.show .panel{transform:none}
+.ptop{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:8px;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;background:var(--bg-blur);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.ptop .lt{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:500;color:var(--muted);min-width:0}
+.ptop .lt img{width:18px;height:18px;object-fit:contain}
+.ptop .lt span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.hero{position:relative;margin:4px 14px 0;border-radius:24px;padding:22px 12px 18px;overflow:hidden;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow)}
+.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 100% 0%,var(--hc) 0%,transparent 55%),radial-gradient(120% 90% at 0% 0%,var(--ac) 0%,transparent 55%);opacity:.22}
+.hero>*{position:relative}
+.hrow{display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:6px;text-align:center}
+.hteam{display:flex;flex-direction:column;align-items:center;gap:9px;min-width:0}
+.hteam .lw{width:72px;height:72px;border-radius:22px;background:var(--card-2);display:grid;place-items:center;border:1px solid var(--line)}
+.hteam .lw img,.hteam .lw .lg{width:52px;height:52px}
+.hteam .nm{font-size:14px;font-weight:600;line-height:1.35;max-width:100%}
+.hmid{padding-top:8px;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:96px}
+.big{display:flex;gap:12px;align-items:center;font-size:40px;font-weight:700;line-height:1;direction:rtl}
+.big i{font-style:normal;color:var(--faint);font-weight:300;font-size:30px}
+.htime{font-size:24px;font-weight:600}
+.hdate{font-size:12px;color:var(--muted)}
+.scorers{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;padding-top:12px;border-top:1px dashed var(--line-2);font-size:12px;color:var(--muted)}
+.scorers div{display:flex;flex-direction:column;gap:3px}
+.scorers div:last-child{text-align:left}
+.scorers b{color:var(--text);font-weight:500}
+
+.tabs{position:sticky;top:calc(62px + env(safe-area-inset-top));z-index:4;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:12px 14px;background:var(--bg)}
+.tab{flex:0 0 auto;height:38px;padding:0 15px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-size:13px;font-weight:500;display:flex;align-items:center;gap:7px;transition:all .2s}
+.tab svg{width:16px;height:16px}
+.tab.on{background:var(--text);color:var(--bg);border-color:transparent;font-weight:600}
+.pane{display:none;padding:0 14px 30px;animation:up .3s ease both}
+.pane.on{display:block}
+.box{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.box h3{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.box h3 svg{width:17px;height:17px}
+.note{font-size:13px;color:var(--muted);text-align:center;padding:26px 10px;line-height:1.8}
+
+/* المجريات */
+.tl{position:relative}
+.tl::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:2px;margin-left:-1px;background:var(--line-2);border-radius:2px}
+.ev{display:grid;grid-template-columns:1fr 46px 1fr;align-items:center;margin:10px 0;position:relative}
+.ev .mn{grid-column:2;justify-self:center;width:40px;height:26px;border-radius:999px;background:var(--card-2);border:1px solid var(--line-2);font-size:11px;font-weight:600;display:grid;place-items:center;color:var(--muted);z-index:1}
+.ev .bd{display:flex;align-items:center;gap:10px;background:var(--card-2);border-radius:14px;padding:9px 11px;min-width:0}
+.ev.h .bd{grid-column:1;grid-row:1}
+.ev.a .bd{grid-column:3;grid-row:1;flex-direction:row-reverse;text-align:left}
+.ev .ic{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;font-size:15px;background:var(--card)}
+.ev .tx{min-width:0;display:flex;flex-direction:column;gap:2px}
+.ev .tx b{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ev .tx small{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ev.goal .bd{background:var(--acc-soft)}
+.ev.goal .ic{background:var(--acc);color:var(--acc-ink)}
+.card-y,.card-r{width:12px;height:16px;border-radius:3px;display:block;transform:rotate(8deg)}
+.card-y{background:var(--gold)}.card-r{background:var(--live)}
+.sub-ic{display:flex;flex-direction:column;font-size:11px;line-height:1;font-weight:700}
+.sub-ic i{font-style:normal}.sub-ic i:first-child{color:var(--acc)}.sub-ic i:last-child{color:var(--live)}
+.div{position:relative;z-index:1;display:flex;justify-content:center;margin:16px 0}
+.div span{background:var(--bg);border:1px solid var(--line-2);color:var(--muted);font-size:11px;font-weight:600;padding:5px 12px;border-radius:999px}
+
+/* الإحصائيات */
+.poss{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.poss b{font-size:26px;font-weight:700}
+.poss span{font-size:12px;color:var(--muted)}
+.pbar{display:flex;height:12px;border-radius:999px;overflow:hidden;gap:4px;margin-bottom:6px}
+.pbar i{display:block;border-radius:999px}
+.st-row{margin:16px 0 0}
+.st-top{display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:7px}
+.st-top span{color:var(--muted);font-size:12px}
+.st-top b{font-weight:600;min-width:32px}
+.st-top b:last-child{text-align:left}
+.st-top b.w{color:var(--text)}
+.st-top b.l{color:var(--muted);font-weight:500}
+.dual{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.dual div{height:6px;border-radius:999px;background:var(--card-2);display:flex;overflow:hidden}
+.dual div:first-child{justify-content:flex-end}
+.dual i{display:block;height:100%;border-radius:999px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.hbar{background:var(--acc)}.abar{background:var(--away)}
+.dim{opacity:.35}
+.st-key{display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:4px}
+.st-key span{display:flex;align-items:center;gap:6px}
+.st-key i{width:9px;height:9px;border-radius:50%}
+
+/* المعلومات */
+.info{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:9px;box-shadow:var(--shadow);min-width:0}
+.tile.w{grid-column:1/-1}
+.tile .ti{width:34px;height:34px;border-radius:11px;background:var(--acc-soft);color:var(--acc);display:grid;place-items:center}
+.tile .ti svg{width:18px;height:18px}
+.tile small{font-size:11px;color:var(--muted)}
+.tile b{font-size:14px;font-weight:600;line-height:1.45;word-break:break-word}
+.tile.empty-v b{color:var(--faint);font-weight:400;font-size:13px}
+
+/* التشكيلة */
+.lsw{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--card-2);border-radius:14px;padding:4px;margin-bottom:12px}
+.lsw button{height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:500;color:var(--muted);min-width:0}
+.lsw button img,.lsw button .lg{width:22px;height:22px}
+.lsw button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lsw button.on{background:var(--card);color:var(--text);font-weight:600;box-shadow:var(--shadow)}
+.fhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:13px}
+.fhead b{font-size:18px;color:var(--acc);direction:ltr;font-weight:700}
+.pitch{position:relative;aspect-ratio:10/11;border-radius:18px;overflow:hidden;background:repeating-linear-gradient(180deg,var(--pitch-a) 0 10%,var(--pitch-b) 10% 20%);box-shadow:inset 0 0 0 2px var(--pitch-line)}
+.pitch .mk{position:absolute;border:2px solid var(--pitch-line)}
+.pitch .cc{width:30%;aspect-ratio:1;left:35%;top:0;border-radius:50%;transform:translateY(-50%)}
+.pitch .pb{width:56%;height:17%;left:22%;bottom:-2px;border-bottom:0}
+.pitch .gb{width:26%;height:7%;left:37%;bottom:-2px;border-bottom:0}
+.pitch .ar{width:20%;aspect-ratio:2/1;left:40%;bottom:17%;border-radius:100px 100px 0 0;border-bottom:0;height:auto}
+.pp{position:absolute;inset:0;display:flex;flex-direction:column-reverse;justify-content:space-around;padding:4% 0 6%}
+.prow{display:flex;justify-content:space-around}
+.pl{display:flex;flex-direction:column;align-items:center;width:68px;text-align:center}
+.pl i{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:700;font-size:13px;border:2px solid rgba(255,255,255,.9);box-shadow:0 3px 8px rgba(0,0,0,.35)}
+.pl span{margin-top:5px;font-size:11px;font-weight:500;color:#fff;background:rgba(0,0,0,.35);padding:2px 6px;border-radius:6px;max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.subs{margin-top:4px}
+.sub{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:13px}
+.sub:first-child{border:0}
+.sub .jn{width:28px;height:28px;border-radius:9px;background:var(--card-2);display:grid;place-items:center;font-size:12px;font-weight:600;color:var(--muted)}
+.sub .in{margin-inline-start:auto;font-size:11px;color:var(--acc);font-weight:600}
+
+/* المفضلة */
+.fcards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.fcard{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;box-shadow:var(--shadow)}
+.fcard img,.fcard .lg{width:48px;height:48px}
+.fcard b{font-size:14px;font-weight:600;min-height:38px;display:flex;align-items:center}
+.fbtn{width:100%;height:38px;border-radius:12px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--card-2);color:var(--text);transition:all .2s}
+.fbtn svg{width:16px;height:16px}
+.fbtn.on{background:var(--gold);color:#241a00}
+.fbtn.on svg{fill:#241a00}
+.flist{display:flex;flex-wrap:wrap;gap:8px}
+.fchip{display:flex;align-items:center;gap:8px;height:38px;padding:0 6px 0 12px;border-radius:999px;background:var(--card-2);font-size:13px;font-weight:500}
+.fchip img,.fchip .lg{width:22px;height:22px}
+.fchip button{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:var(--muted)}
+.fchip button svg{width:14px;height:14px}
+
+.toast{position:fixed;bottom:calc(28px + env(safe-area-inset-bottom));left:50%;transform:translate(-50%,20px);background:var(--text);color:var(--bg);padding:11px 18px;border-radius:14px;font-size:13px;font-weight:500;opacity:0;pointer-events:none;transition:all .3s;z-index:90;white-space:nowrap}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <header>
-  <div class="top">
-    <div class="logo">Football <span>24</span></div>
-    <button class="livebtn" id="liveBtn">● مباشر فقط</button>
+  <div class="bar">
+    <div class="brand"><span class="ball"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.2l3.6 2.6-1.4 4.2H9.8L8.4 9.8z" fill="#fff"/><path d="M12 3v4.2M15.6 9.8l4.8-1.5M14.2 14l2.9 4.2M9.8 14l-2.9 4.2M8.4 9.8L3.6 8.3"/></svg></span>Football <b>24</b></div>
+    <div class="acts">
+      <button class="ib" id="searchBtn" aria-label="بحث"></button>
+      <button class="ib" id="themeBtn" aria-label="الوضع النهاري والليلي"></button>
+    </div>
   </div>
-  <nav>
-    <button class="on" data-v="matches"><b>⚽</b>المباريات</button>
-    <button data-v="table"><b>📊</b>الترتيب</button>
-  </nav>
-  <div class="dates" id="dates">
-    <button id="next">›</button>
-    <button class="today" id="todayBtn">اليوم</button>
-    <button id="prev">‹</button>
-    <input type="date" id="pick">
+  <div class="search" id="searchBox"><input id="q" type="search" placeholder="ابحث عن فريق..." autocomplete="off"><span id="qIcon"></span></div>
+  <div class="seg" id="seg">
+    <button class="on" data-v="matches"></button>
+    <button data-v="table"></button>
   </div>
+  <div class="days" id="days"></div>
   <div class="chips" id="chips"></div>
 </header>
 <main id="main"></main>
 <footer dir="ltr">© 2026 Mohammed Eyd Kadher. All Rights Reserved.</footer>
 <div class="sheet" id="sheet"><div class="panel" id="panel"></div></div>
-
+<div class="toast" id="toast"></div>
 <script>
-// ===== الإعدادات =====
+// =====================================================================
+//  Football 24 — © 2026 Mohammed Eyd Kadher. All Rights Reserved.
+// =====================================================================
+
+// ===== الإعدادات (الـ API) =====
 const API = 'https://site.api.espn.com/apis/site/v2/sports/soccer/';
 const API_TABLE = 'https://site.api.espn.com/apis/v2/sports/soccer/';
 const LEAGUES = [
@@ -137,10 +347,19 @@ const LEAGUES = [
   {id:'ksa.1', n:'الدوري السعودي'},
   {id:'afc.champions', n:'دوري أبطال آسيا'},
   {id:'uefa.europa', n:'الدوري الأوروبي'},
+  {id:'uefa.europa.conf', n:'دوري المؤتمر الأوروبي'},
   {id:'uefa.nations', n:'دوري الأمم الأوروبية'},
   {id:'fifa.friendly', n:'مباريات ودية دولية'}
 ];
 const REFRESH_SEC = 30;
+
+// ===== القنوات الناقلة والمعلقين (حسب الدوري) — عدّلها براحتك =====
+const CHANNELS = {
+  'uefa.champions':'beIN SPORTS',
+  'eng.1':'beIN SPORTS',
+  'esp.1':'beIN SPORTS'
+};
+const COMMENTATORS = {};
 
 // ===== أسماء الفرق بالعربي =====
 const TEAM_AR = {
@@ -156,14 +375,10 @@ const TEAM_AR = {
 "England":"إنجلترا","Spain":"إسبانيا","France":"فرنسا","Germany":"ألمانيا","Italy":"إيطاليا","Portugal":"البرتغال","Netherlands":"هولندا","Belgium":"بلجيكا","Croatia":"كرواتيا","Switzerland":"سويسرا","Denmark":"الدنمارك","Sweden":"السويد","Norway":"النرويج","Poland":"بولندا","Austria":"النمسا","Turkey":"تركيا","Türkiye":"تركيا","Scotland":"اسكتلندا","Wales":"ويلز","Republic of Ireland":"أيرلندا","Ireland":"أيرلندا","Northern Ireland":"أيرلندا الشمالية","Serbia":"صربيا","Ukraine":"أوكرانيا","Czechia":"التشيك","Czech Republic":"التشيك","Hungary":"المجر","Greece":"اليونان","Romania":"رومانيا",
 "Brazil":"البرازيل","Argentina":"الأرجنتين","Uruguay":"الأوروغواي","Colombia":"كولومبيا","Chile":"تشيلي","Mexico":"المكسيك","USA":"الولايات المتحدة","United States":"الولايات المتحدة","Canada":"كندا","Senegal":"السنغال","Nigeria":"نيجيريا","Ghana":"غانا","Cameroon":"الكاميرون","Ivory Coast":"ساحل العاج","Côte d'Ivoire":"ساحل العاج"
 };
-const norm = s => String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
-const AR_IDX = {}; for(const k in TEAM_AR) AR_IDX[norm(k)] = TEAM_AR[k];
-const tname = (t, long) => {
-  if(!t) return '';
-  for(const n of [t.displayName, t.shortDisplayName, t.name, t.location]){ const a = AR_IDX[norm(n)]; if(a) return a; }
-  return long ? (t.displayName || t.shortDisplayName) : (t.shortDisplayName || t.displayName);
-};
-
+Object.assign(TEAM_AR, {
+"Pohang Steelers":"بوهانغ ستيلرز","Gamba Osaka":"غامبا أوساكا","Ulsan HD":"أولسان","Ulsan Hyundai":"أولسان","Jeonbuk Hyundai Motors":"جيونبوك","Jeonbuk Motors":"جيونبوك","FC Seoul":"إف سي سيول","Gwangju FC":"غوانغجو","Kawasaki Frontale":"كاواساكي فرونتال","Yokohama F. Marinos":"يوكوهاما مارينوس","Vissel Kobe":"فيسيل كوبي","Urawa Red Diamonds":"أوراوا","Sanfrecce Hiroshima":"سانفريتشي هيروشيما","Kashima Antlers":"كاشيما أنتلرز","Machida Zelvia":"ماتشيدا زيلفيا","Shanghai Port":"شنغهاي بورت","Shanghai Shenhua":"شنغهاي شينهوا","Shandong Taishan":"شاندونغ تايشان","Chengdu Rongcheng":"تشنغدو رونغتشنغ","Buriram United":"بوريرام يونايتد","Johor Darul Ta'zim":"جوهور دار التعظيم","Melbourne City":"ملبورن سيتي","Central Coast Mariners":"سنترال كوست","Al Wahda FC":"الوحدة","Al Shabab Al Ahli":"شباب الأهلي","Pakhtakor":"باختاكور","Nasaf":"ناساف"
+});
+// ===== أسماء اللاعبين بالعربي =====
 const PLAYER_AR = {
 "Lamine Yamal":"لامين يامال",
 "Robert Lewandowski":"ليفاندوفسكي",
@@ -557,85 +772,54 @@ const PLAYER_AR = {
 "Luis Suárez":"لويس سواريز",
 "Son Heung-min":"سون هيونغ مين"
 };
-const PL_IDX = {}; for(const k in PLAYER_AR) PL_IDX[norm(k)] = PLAYER_AR[k];
-const pname = (a, short) => {
-  if(!a) return '';
-  const ar = PL_IDX[norm(a.displayName)] || PL_IDX[norm(a.fullName)];
-  if(ar) return ar;
-  return short ? (a.shortName || a.displayName || '') : (a.displayName || a.shortName || '');
+
+// ===== أيقونات =====
+const ic = (d, extra='') => `<svg class="i" viewBox="0 0 24 24" ${extra}>${d}</svg>`;
+const I = {
+  search: ic('<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>'),
+  sun: ic('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),
+  moon: ic('<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'),
+  ball: ic('<circle cx="12" cy="12" r="9"/><path d="M12 7.5l3.4 2.5-1.3 4H9.9L8.6 10z"/>'),
+  table: ic('<rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9.5h18M9 9.5V20"/>'),
+  star: ic('<path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/>'),
+  close: ic('<path d="M6 6l12 12M18 6L6 18"/>'),
+  share: ic('<circle cx="18" cy="5.5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="18.5" r="2.5"/><path d="M8.2 10.8l7.6-4M8.2 13.2l7.6 4"/>'),
+  cal: ic('<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>'),
+  chev: ic('<path d="M14 6l-6 6 6 6"/>'),
+  refresh: ic('<path d="M20 11a8 8 0 0 0-14.5-4.5M4 4v4h4M4 13a8 8 0 0 0 14.5 4.5M20 20v-4h-4"/>'),
+  timeline: ic('<path d="M12 3v18"/><circle cx="12" cy="7" r="2.2"/><circle cx="12" cy="17" r="2.2"/><path d="M14.5 7H20M4 17h5.5"/>'),
+  stats: ic('<path d="M5 20V11M12 20V4M19 20v-6"/>'),
+  info: ic('<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.6v.1"/>'),
+  shirt: ic('<path d="M8 3.5L3.5 6.5l2 4 2-1V20.5h9V9.5l2 1 2-4L16 3.5c-.7 1.6-2.2 2.5-4 2.5s-3.3-.9-4-2.5z"/>'),
+  trophy: ic('<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM17 6h3v2a3 3 0 0 1-3 3M7 6H4v2a3 3 0 0 0 3 3"/>'),
+  stadium: ic('<ellipse cx="12" cy="12" rx="9.5" ry="5.5"/><ellipse cx="12" cy="12" rx="4.5" ry="2.2"/>'),
+  pin: ic('<path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/>'),
+  whistle: ic('<circle cx="9" cy="14.5" r="5"/><path d="M12.5 11L21 7v3.5l-6.5 2.8M9 14.5h.01"/>'),
+  users: ic('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M21.5 20a6.5 6.5 0 0 0-4-6"/>'),
+  tv: ic('<rect x="3" y="6.5" width="18" height="13" rx="2.5"/><path d="M8 3l4 3.5L16 3"/>'),
+  mic: ic('<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>'),
+  globe: ic('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/>'),
+  clock: ic('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+  wifi: ic('<path d="M2 8.5a15 15 0 0 1 20 0M5 12a10 10 0 0 1 14 0M8.5 15.5a5 5 0 0 1 7 0M12 19h.01"/>')
 };
+const starFill = cls => `<svg class="i sf ${cls}" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg>`;
 
-// ===== التشكيلة =====
-function posGroup(p){
-  const a = String(p.position?.abbreviation || p.position?.name || '').toUpperCase();
-  if(/^G/.test(a)) return 0;
-  if(/^(D|CD|CB|LB|RB|LWB|RWB|SW)/.test(a) || /BACK|DEFEN/.test(a)) return 1;
-  if(/^(F|CF|ST|LW|RW|SS|W)/.test(a) || /FORWARD|STRIKER|WING/.test(a)) return 3;
-  return 2;
-}
-function txtColor(hex){
-  const h = String(hex||'').replace('#',''); if(h.length < 6) return '#fff';
-  const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
-  return (r*299 + g*587 + b*114)/1000 > 150 ? '#111' : '#fff';
-}
-function teamLineup(r){
-  const list = r.roster || [];
-  const starters = list.filter(p => p.starter);
-  const subs = list.filter(p => !p.starter);
-  if(!starters.length) return '';
-  const col = '#' + String(r.team?.color || '00c46a').replace('#','');
-  const tc = txtColor(col);
-  const dot = p => `<div class="pl"><i style="background:${col};color:${tc}">${esc(p.jersey ?? '')}</i><span>${esc(pname(p.athlete, true))}</span></div>`;
-  const gk = starters.filter(p => posGroup(p) === 0).slice(0,1);
-  const out = starters.filter(p => !gk.includes(p))
-    .sort((a,b) => posGroup(a) - posGroup(b) || (a.formationPlace ?? 99) - (b.formationPlace ?? 99));
-  const form = String(r.formation || '').trim();
-  const counts = /^\d(-\d)+$/.test(form) ? form.split('-').map(Number) : null;
-  let rows = [];
-  if(counts && counts.reduce((x,y) => x+y, 0) === out.length){
-    let i = 0; rows = counts.map(c => out.slice(i, i += c));
-  } else {
-    [1,2,3].forEach(g => { const rr = out.filter(p => posGroup(p) === g); if(rr.length) rows.push(rr); });
-  }
-  const pitch = `<div class="pitch"><div class="prow">${gk.map(dot).join('')}</div>${rows.map(rr => `<div class="prow">${rr.map(dot).join('')}</div>`).join('')}</div>`;
-  const subsHtml = subs.length ? `<div class="subs"><div style="border:0;color:var(--muted)">الاحتياط</div>${subs.map(p => `<div><b>${esc(p.jersey ?? '')}</b><span>${esc(pname(p.athlete))}${p.subbedIn ? ' 🔁' : ''}</span></div>`).join('')}</div>` : '';
-  return `<div class="lt"><span>${esc(tname(r.team, true))}</span>${form ? `<em>${esc(form)}</em>` : ''}</div>${pitch}${subsHtml}`;
-}
-function lineupsHTML(rosters){
-  const rs = (rosters || []).filter(r => (r.roster || []).some(p => p.starter));
-  if(!rs.length) return '';
-  rs.sort((a,b) => (a.homeAway === 'home' ? 0 : 1) - (b.homeAway === 'home' ? 0 : 1));
-  return `<div class="sec"><h3>التشكيلة والخطة</h3>
-    <div class="tabs2">${rs.map((r,i) => `<button class="${i?'':'on'}" onclick="showLU(${i},this)">${esc(tname(r.team))}</button>`).join('')}</div>
-    ${rs.map((r,i) => `<div class="lu" data-i="${i}" style="${i?'display:none':''}">${teamLineup(r)}</div>`).join('')}
-  </div>`;
-}
-function showLU(i, btn){
-  btn.parentNode.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === btn));
-  document.querySelectorAll('.lu').forEach(d => d.style.display = d.dataset.i == i ? '' : 'none');
-}
-
-// ===== المعلق (حسب الدوري) — الـ API ما يعطي المعلق، اكتبه هنا إذا تريد =====
-const COMMENTATORS = {};
-
-// ===== القنوات الناقلة بالمنطقة العربية (حسب الدوري) — عدّلها براحتك =====
-const CHANNELS = {
-  'uefa.champions':'beIN SPORTS',
-  'eng.1':'beIN SPORTS',
-  'esp.1':'beIN SPORTS'
-};
-
-
-
-const state = {date:new Date(), league:'all', view:'matches', liveOnly:false};
+// ===== أدوات =====
 const $ = id => document.getElementById(id);
-const main = $('main');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const ymd = d => d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
-const isoDay = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const LS = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+const pad = n => String(n).padStart(2,'0');
+const ymd = d => d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate());
+const isoDay = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const sameDay = (a,b) => ymd(a) === ymd(b);
-const spinner = '<div class="spin"></div>';
-const img = (src, cls='') => src ? `<img src="${esc(src)}" class="${cls}" loading="lazy" onerror="this.style.visibility='hidden'">` : '<img style="visibility:hidden">';
+const LOC = 'ar-u-nu-latn';
+const fmtTime = d => new Date(d).toLocaleTimeString(LOC, {hour:'numeric', minute:'2-digit'});
+const fmtDate = d => new Date(d).toLocaleDateString(LOC, {weekday:'long', day:'numeric', month:'long'});
+const WD = ['أحد','اثنين','ثلاثاء','أربعاء','خميس','جمعة','سبت'];
+function toast(msg){ const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2200); }
 
 async function getJSON(url){
   const r = await fetch(url + (url.includes('?') ? '&' : '?') + '_=' + Date.now(), {cache:'no-store'});
@@ -643,203 +827,551 @@ async function getJSON(url){
   return r.json();
 }
 
-// ===== شريط التاريخ والدوريات =====
-function drawDate(){
-  const t = new Date(), y = new Date(); y.setDate(t.getDate()-1);
-  const tm = new Date(); tm.setDate(t.getDate()+1);
-  let label = state.date.toLocaleDateString('ar', {weekday:'long', day:'numeric', month:'long'});
-  if(sameDay(state.date,t)) label = 'اليوم';
-  else if(sameDay(state.date,y)) label = 'أمس';
-  else if(sameDay(state.date,tm)) label = 'غداً';
-  $('todayBtn').textContent = label;
-  $('pick').value = isoDay(state.date);
-  $('dates').style.display = state.view === 'matches' ? 'flex' : 'none';
-  $('liveBtn').style.display = state.view === 'matches' ? '' : 'none';
+// ===== الأسماء بالعربي =====
+const norm = s => String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+const AR_IDX = {}; for(const k in TEAM_AR) AR_IDX[norm(k)] = TEAM_AR[k];
+const PL_IDX = {}; for(const k in PLAYER_AR) PL_IDX[norm(k)] = PLAYER_AR[k];
+const tname = (t, long) => {
+  if(!t) return '';
+  for(const n of [t.displayName, t.shortDisplayName, t.name, t.location]){ const a = AR_IDX[norm(n)]; if(a) return a; }
+  return long ? (t.displayName || t.shortDisplayName || '') : (t.shortDisplayName || t.displayName || '');
+};
+const pname = (a, short) => {
+  if(!a) return '';
+  const ar = PL_IDX[norm(a.displayName)] || PL_IDX[norm(a.fullName)];
+  if(ar) return ar;
+  return short ? (a.shortName || a.displayName || '') : (a.displayName || a.shortName || '');
+};
+const teamLogo = t => t?.logo || t?.logos?.[0]?.href || '';
+const teamColor = t => { const c = String(t?.color || '').replace('#',''); return /^[0-9a-f]{6}$/i.test(c) ? '#' + c : '#3a4256'; };
+function logo(t, cls='lg'){
+  const src = teamLogo(t);
+  if(src) return `<img class="${cls}" src="${esc(src)}" alt="" loading="lazy" onerror="this.outerHTML='<span class=&quot;${cls} ph&quot; style=&quot;background:${teamColor(t)}&quot;>${esc(tname(t).slice(0,1))}</span>'">`;
+  return `<span class="${cls} ph" style="background:${teamColor(t)}">${esc(tname(t).slice(0,1))}</span>`;
 }
-function drawChips(){
-  const list = state.view === 'matches' ? [{id:'all', n:'الكل'}, ...LEAGUES] : LEAGUES;
-  if(state.view === 'table' && state.league === 'all') state.league = LEAGUES[1].id;
-  $('chips').innerHTML = list.map(l => `<button class="chip ${l.id===state.league?'on':''}" data-id="${l.id}">${l.n}</button>`).join('');
+function inkOn(hex){
+  const h = hex.replace('#',''); const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
+  return (r*299 + g*587 + b*114)/1000 > 150 ? '#111' : '#fff';
 }
-$('chips').onclick = e => { const b = e.target.closest('.chip'); if(!b) return; state.league = b.dataset.id; drawChips(); load(); };
-const shift = n => { state.date.setDate(state.date.getDate()+n); drawDate(); load(); };
-$('prev').onclick = () => shift(-1);
-$('next').onclick = () => shift(1);
-$('todayBtn').onclick = () => { state.date = new Date(); drawDate(); load(); };
-$('pick').onchange = e => { if(!e.target.value) return; const [y,m,d] = e.target.value.split('-'); state.date = new Date(y, m-1, d); drawDate(); load(); };
-$('liveBtn').onclick = () => { state.liveOnly = !state.liveOnly; $('liveBtn').classList.toggle('on', state.liveOnly); load(); };
-document.querySelector('nav').onclick = e => {
-  const b = e.target.closest('button'); if(!b) return;
-  state.view = b.dataset.v;
-  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
-  if(state.view === 'matches') state.league = 'all';
-  drawChips(); drawDate(); load();
+
+// ===== الحالة =====
+const today0 = () => { const d = new Date(); d.setHours(0,0,0,0); return d; };
+const state = {
+  view:'matches', date:today0(), filter:'all', tableLeague:'eng.1', q:'',
+  groups:[], loading:false, failed:false, updated:null,
+  tab:'events', luIdx:0
+};
+let favs = LS.get('f24.favs', {});          // id -> {n, logo, color}
+let openNow = null;                          // المباراة المفتوحة {lid, eid}
+let sheetData = null;
+
+// ===== الوضع النهاري / الليلي =====
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+  document.querySelector('meta[name=theme-color]').setAttribute('content', bg);
+  try{ if(window.F24 && F24.theme) F24.theme(bg, t === 'light'); }catch(e){}
+  $('themeBtn').innerHTML = t === 'light' ? I.moon : I.sun;
+}
+$('themeBtn').onclick = () => {
+  const t = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  LS.set('f24.theme', t); applyTheme(t);
 };
 
+// ===== البحث =====
+$('searchBtn').innerHTML = I.search;
+$('qIcon').innerHTML = I.search;
+$('searchBtn').onclick = () => {
+  const box = $('searchBox'), on = !box.classList.contains('show');
+  box.classList.toggle('show', on); $('searchBtn').classList.toggle('on', on);
+  if(on) $('q').focus(); else { $('q').value = ''; state.q = ''; render(); }
+};
+$('q').oninput = e => { state.q = e.target.value.trim(); render(); };
+
+// ===== التبويبات الرئيسية =====
+const segBtns = $('seg').querySelectorAll('button');
+segBtns[0].innerHTML = I.ball + 'المباريات';
+segBtns[1].innerHTML = I.table + 'الترتيب';
+$('seg').onclick = e => {
+  const b = e.target.closest('button'); if(!b || b.dataset.v === state.view) return;
+  state.view = b.dataset.v;
+  segBtns.forEach(x => x.classList.toggle('on', x === b));
+  drawBar(); load();
+};
+
+// ===== شريط الأيام =====
+function drawDays(){
+  const box = $('days');
+  if(state.view !== 'matches'){ box.style.display = 'none'; return; }
+  box.style.display = 'flex';
+  const t = today0(), list = [];
+  for(let i = -3; i <= 4; i++){ const d = new Date(t); d.setDate(t.getDate() + i); list.push(d); }
+  if(!list.some(d => sameDay(d, state.date))) list.push(new Date(state.date));
+  list.sort((a,b) => a - b);
+  box.innerHTML = list.map(d => {
+    const lbl = sameDay(d,t) ? 'اليوم' : (d - t === 86400000 ? 'غداً' : (t - d === 86400000 ? 'أمس' : WD[d.getDay()]));
+    return `<button class="day ${sameDay(d,state.date)?'on':''}" data-d="${isoDay(d)}"><small>${lbl}</small><b class="num">${d.getDate()}</b></button>`;
+  }).join('') + `<label class="day cal" aria-label="اختر تاريخ">${I.cal}<input type="date" id="pick" value="${isoDay(state.date)}"></label>`;
+  const on = box.querySelector('.day.on'); if(on) on.scrollIntoView({inline:'center', block:'nearest'});
+}
+$('days').onclick = e => {
+  const b = e.target.closest('.day[data-d]'); if(!b) return;
+  const [y,m,d] = b.dataset.d.split('-'); state.date = new Date(y, m-1, d); drawDays(); load();
+};
+$('days').onchange = e => {
+  if(e.target.id !== 'pick' || !e.target.value) return;
+  const [y,m,d] = e.target.value.split('-'); state.date = new Date(y, m-1, d); drawDays(); load();
+};
+
+// ===== الفلاتر =====
+function drawChips(){
+  let html = '';
+  if(state.view === 'matches'){
+    const live = countLive();
+    html += chip('all', 'الكل');
+    html += chip('live', `<span class="dot"></span>مباشر${live ? ` <span class="cnt num">${live}</span>` : ''}`);
+    html += chip('fav', starFill('') + 'المفضلة');
+    LEAGUES.forEach(l => { const g = state.groups.find(x => x.l.id === l.id); html += chip(l.id, (g?.logo ? `<img src="${esc(g.logo)}" alt="">` : '') + l.n); });
+  } else {
+    LEAGUES.filter(l => !/friendly|nations/.test(l.id)).forEach(l => html += chip(l.id, l.n, state.tableLeague));
+  }
+  $('chips').innerHTML = html;
+}
+const chip = (id, label, cur = state.filter) => `<button class="chip ${id===cur?'on':''}" data-id="${id}">${label}</button>`;
+$('chips').onclick = e => {
+  const b = e.target.closest('.chip'); if(!b) return;
+  if(state.view === 'matches'){ state.filter = b.dataset.id; drawChips(); render(); }
+  else { state.tableLeague = b.dataset.id; drawChips(); loadTable(); }
+  b.scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'});
+};
+function drawBar(){ drawDays(); drawChips(); }
+
 function load(silent){ state.view === 'matches' ? loadMatches(silent) : loadTable(); }
+function render(){ if(state.view === 'matches') renderMatches(); }
+
+// ===== حالة المباراة =====
+function status(s){
+  const t = s?.type || {}, n = t.name || '', st = t.state;
+  if(/POSTPONED/.test(n)) return {k:'off', label:'مؤجلة'};
+  if(/CANCEL|ABANDON|SUSPEND/.test(n)) return {k:'off', label:'ملغاة'};
+  if(st === 'pre') return {k:'pre'};
+  if(st === 'in'){
+    if(/HALFTIME/.test(n) || t.shortDetail === 'HT') return {k:'live', label:'استراحة', min:45};
+    if(/SHOOTOUT/.test(n)) return {k:'live', label:'ترجيح', min:120};
+    const clk = s.displayClock || '';
+    return {k:'live', label: clk || 'مباشر', min: parseInt(clk) || 0};
+  }
+  if(/PEN/.test(n)) return {k:'ft', label:'انتهت بالترجيح'};
+  if(/AET/.test(n)) return {k:'ft', label:'بعد التمديد'};
+  return {k:'ft', label:'انتهت'};
+}
+const sides = c => ({
+  H: c?.competitors?.find(x => x.homeAway === 'home') || {},
+  A: c?.competitors?.find(x => x.homeAway === 'away') || {}
+});
+function countLive(){ return state.groups.reduce((n,g) => n + g.ev.filter(e => e.status?.type?.state === 'in').length, 0); }
+const isFavEv = e => { const {H,A} = sides(e.competitions?.[0]); return !!(favs[H.team?.id] || favs[A.team?.id]); };
 
 // ===== المباريات =====
+function skeleton(){
+  return [0,1].map(() => `<div class="group">${'<div class="sk"></div>'.repeat(4)}</div>`).join('');
+}
 async function loadMatches(silent){
-  if(!silent) main.innerHTML = spinner;
-  const list = state.league === 'all' ? LEAGUES : LEAGUES.filter(l => l.id === state.league);
-  const res = await Promise.allSettled(list.map(l =>
-    getJSON(`${API}${l.id}/scoreboard?dates=${ymd(state.date)}`).then(d => ({l, logo:d.leagues?.[0]?.logos?.[0]?.href, ev:d.events || []}))
+  const reqDate = ymd(state.date);
+  if(!silent){ state.groups = []; $('main').innerHTML = skeleton(); }
+  const res = await Promise.allSettled(LEAGUES.map(l =>
+    getJSON(`${API}${l.id}/scoreboard?dates=${reqDate}`).then(d => ({l, logo:d.leagues?.[0]?.logos?.[0]?.href, ev:d.events || []}))
   ));
-  if(state.view !== 'matches') return;
+  if(state.view !== 'matches' || ymd(state.date) !== reqDate) return;
   if(res.every(r => r.status === 'rejected')){
-    main.innerHTML = '<div class="msg">تعذّر الاتصال بالخادم 😕<br>تأكد من الإنترنت وحاول مرة ثانية<br><br><button class="livebtn" onclick="load()">إعادة المحاولة</button></div>';
-    return;
+    if(silent && state.groups.length) return;
+    state.failed = true; state.groups = [];
+    $('main').innerHTML = emptyBox(I.wifi, 'تعذّر الاتصال بالخادم<br>تأكد من الإنترنت وحاول مرة ثانية', `<button class="btn" onclick="load()">${I.refresh}إعادة المحاولة</button>`);
+    drawChips(); return;
   }
-  let groups = res.filter(r => r.status === 'fulfilled').map(r => r.value);
-  if(state.liveOnly) groups = groups.map(g => ({...g, ev:g.ev.filter(e => e.status?.type?.state === 'in')}));
+  state.failed = false;
+  state.groups = res.filter(r => r.status === 'fulfilled').map(r => r.value);
+  state.groups.forEach(g => g.ev.sort((a,b) => new Date(a.date) - new Date(b.date)));
+  state.updated = new Date();
+  drawChips(); renderMatches();
+}
+const emptyBox = (icon, txt, extra='') => `<div class="empty"><div class="ill">${icon}</div>${txt}${extra ? `<div class="btn-w">${extra}</div>` : ''}</div>`;
+
+function matchSearch(e){
+  if(!state.q) return true;
+  const q = norm(state.q), qa = state.q.replace(/\s+/g,'');
+  const {H,A} = sides(e.competitions?.[0]);
+  return [H.team, A.team].some(t => t && ((q && norm(t.displayName + ' ' + (t.shortDisplayName||'')).includes(q)) || (qa && tname(t,true).replace(/\s+/g,'').includes(qa))));
+}
+function renderMatches(){
+  if(state.failed) return;
+  let groups = state.groups.map(g => ({...g, ev: g.ev.filter(matchSearch)}));
+  const f = state.filter;
+  if(f === 'live') groups = groups.map(g => ({...g, ev: g.ev.filter(e => e.status?.type?.state === 'in')}));
+  else if(f === 'fav') groups = groups.map(g => ({...g, ev: g.ev.filter(isFavEv)}));
+  else if(f !== 'all') groups = groups.filter(g => g.l.id === f);
   groups = groups.filter(g => g.ev.length);
+
+  let html = '';
+  if(f === 'all' && !state.q){
+    const mine = []; state.groups.forEach(g => g.ev.forEach(e => { if(isFavEv(e)) mine.push([e, g]); }));
+    if(mine.length) html += `<div class="sec-t">${starFill('')}مباريات فرقك</div><div class="group">${mine.map(([e,g]) => matchRow(e, g.l.id)).join('')}</div>`;
+  }
   if(!groups.length){
-    main.innerHTML = `<div class="msg">${state.liveOnly ? 'ماكو مباريات مباشرة هسه' : 'ماكو مباريات بهذا اليوم'}</div>`;
+    const msg = f === 'live' ? 'ماكو مباريات مباشرة هسه' :
+                f === 'fav' ? (Object.keys(favs).length ? 'فرقك المفضلة ما عدها مباريات بهذا اليوم' : 'بعدك ما ضفت فرق للمفضلة<br>افتح أي مباراة واضغط ⭐ على الفريق') :
+                state.q ? 'ما لگيت فريق بهذا الاسم' : 'ماكو مباريات بهذا اليوم';
+    $('main').innerHTML = html + emptyBox(f === 'fav' ? I.star : I.ball, msg);
     return;
   }
-  main.innerHTML = groups.map(g => `
-    <div class="group">
-      <div class="ghead">${g.logo ? img(g.logo) : ''}${esc(g.l.n)}</div>
-      ${g.ev.sort((a,b) => new Date(a.date) - new Date(b.date)).map(e => matchRow(e, g.l.id)).join('')}
-    </div>`).join('') + `<div class="upd">آخر تحديث ${new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</div>`;
+  html += groups.map((g,i) => `
+    <div class="group" style="animation-delay:${Math.min(i,6)*40}ms">
+      <button class="gh" data-league="${g.l.id}">
+        <span class="gl">${g.logo ? `<img src="${esc(g.logo)}" alt="">` : ''}</span>${esc(g.l.n)}
+        <span class="gc"><span class="num">${g.ev.length}</span>${I.chev}</span>
+      </button>
+      ${g.ev.map(e => matchRow(e, g.l.id)).join('')}
+    </div>`).join('');
+  if(state.updated) html += `<div class="upd">${I.refresh}آخر تحديث <span class="num">${state.updated.toLocaleTimeString(LOC,{hour:'numeric',minute:'2-digit',second:'2-digit'})}</span></div>`;
+  $('main').innerHTML = html;
 }
 
 function matchRow(e, lid){
-  const c = e.competitions?.[0] || {};
-  const home = c.competitors?.find(x => x.homeAway === 'home') || {};
-  const away = c.competitors?.find(x => x.homeAway === 'away') || {};
-  const st = e.status?.type?.state;
+  const c = e.competitions?.[0] || {}, {H, A} = sides(c), s = status(e.status);
   let mid;
-  if(st === 'pre'){
-    const t = new Date(e.date).toLocaleTimeString('ar', {hour:'2-digit', minute:'2-digit'});
-    mid = `<div class="time">${t}</div><div class="st">${e.status?.type?.detail?.includes('Postponed') ? 'مؤجلة' : ''}</div>`;
-  } else {
-    const lbl = st === 'in' ? (e.status?.type?.shortDetail === 'HT' ? 'استراحة' : esc(e.status?.displayClock || 'مباشر')) : 'انتهت';
-    mid = `<div class="score"><span>${esc(home.score)}</span><span>-</span><span>${esc(away.score)}</span></div><div class="st ${st==='in'?'live':''}">${lbl}</div>`;
+  if(s.k === 'pre') mid = `<span class="tm num">${fmtTime(e.date)}</span>`;
+  else if(s.k === 'off') mid = `<span class="tm num">${fmtTime(e.date)}</span><span class="pill">${s.label}</span>`;
+  else {
+    const so = (H.shootoutScore != null || A.shootoutScore != null) ? [H.shootoutScore ?? 0, A.shootoutScore ?? 0] : null;
+    mid = `<div class="sc"><span class="num">${esc(H.score)}</span><i>-</i><span class="num">${esc(A.score)}</span></div>
+           ${so ? `<span class="pill num">(${so[0]} - ${so[1]})</span>` : ''}
+           <span class="pill ${s.k === 'live' ? 'live' : ''}"><span class="num">${esc(s.label)}</span></span>`;
   }
-  const team = (t, side) => `<div class="team ${side} ${t.winner?'win':''}">${img(t.team?.logo)}<span>${esc(tname(t.team))}</span></div>`;
-  return `<div class="match" data-l="${lid}" data-e="${e.id}">${team(home,'home')}<div class="mid">${mid}</div>${team(away,'away')}</div>`;
+  const ft = s.k === 'ft';
+  const team = (x, cls) => {
+    const res = ft && (x.winner ? 'win' : (H.winner || A.winner) ? 'lose' : '');
+    return `<div class="t ${cls} ${res || ''}">${logo(x.team)}<span>${esc(tname(x.team))}</span></div>`;
+  };
+  const prog = s.k === 'live' && s.min ? `<i class="prog" style="--p:${Math.min(100, s.min/90*100)}%"></i>` : '';
+  return `<button class="m ${isFavEv(e)?'is-fav':''}" data-l="${lid}" data-e="${e.id}">${team(H,'h')}<div class="c">${mid}</div>${team(A,'a')}${prog}</button>`;
 }
-main.addEventListener('click', e => { const m = e.target.closest('.match'); if(m) openMatch(m.dataset.l, m.dataset.e); });
+$('main').addEventListener('click', e => {
+  const m = e.target.closest('.m'); if(m) return openMatch(m.dataset.l, m.dataset.e);
+  const g = e.target.closest('.gh'); if(g){ state.filter = g.dataset.league; drawChips(); render(); window.scrollTo({top:0, behavior:'smooth'}); }
+});
 
-// ===== تفاصيل المباراة =====
-const STATS = {possessionPct:'الاستحواذ %', totalShots:'التسديدات', shotsOnTarget:'على المرمى', wonCorners:'الركنيات', foulsCommitted:'الأخطاء', offsides:'التسلل', yellowCards:'بطاقات صفراء', redCards:'بطاقات حمراء'};
-let openNow = null; // المباراة المفتوحة حالياً
+// =====================================================================
+//  نافذة المباراة: مجريات • إحصائيات • معلومات • تشكيلة • مفضلة
+// =====================================================================
+const TABS = [
+  ['events', 'المجريات', 'timeline'],
+  ['stats', 'الإحصائيات', 'stats'],
+  ['info', 'معلومات المباراة', 'info'],
+  ['lineup', 'التشكيلة والخطة', 'shirt'],
+  ['fav', 'الفرق المفضلة', 'star']
+];
+function leagueOf(lid){ return LEAGUES.find(l => l.id === lid) || {n:''}; }
+function leagueLogo(lid){ return state.groups.find(g => g.l.id === lid)?.logo || ''; }
+
 async function openMatch(lid, eid, silent){
   const panel = $('panel');
-  openNow = {lid, eid};
   const keepScroll = panel.scrollTop;
-  const keepTab = [...document.querySelectorAll('.tabs2 button')].findIndex(b => b.classList.contains('on'));
   if(!silent){
+    openNow = {lid, eid}; state.tab = 'events'; state.luIdx = 0;
     $('sheet').classList.add('show');
-    panel.innerHTML = '<button class="close" onclick="closeSheet()">✕</button>' + spinner;
+    panel.innerHTML = topBar(lid) + `<div class="hero"><div class="sk" style="height:150px;border:0"></div></div>`;
+    panel.scrollTop = 0;
   }
   try{
     const d = await getJSON(`${API}${lid}/summary?event=${eid}`);
-    const c = d.header?.competitions?.[0] || {};
-    const home = c.competitors?.find(x => x.homeAway === 'home') || {};
-    const away = c.competitors?.find(x => x.homeAway === 'away') || {};
-    const st = c.status?.type?.state;
-    const center = st === 'pre'
-      ? `<div class="time">${new Date(c.date).toLocaleString('ar',{weekday:'short',hour:'2-digit',minute:'2-digit'})}</div>`
-      : `<div class="big"><span>${esc(home.score)}</span><span>-</span><span>${esc(away.score)}</span></div><div class="st ${st==='in'?'live':''}">${st==='in' ? esc(c.status?.displayClock) : 'انتهت'}</div>`;
-    let html = `<button class="close" onclick="closeSheet()">✕</button>
-      <div class="mh">
-        <div>${img(home.team?.logos?.[0]?.href || home.team?.logo)}<div class="nm">${esc(tname(home.team, true))}</div></div>
-        <div>${center}</div>
-        <div>${img(away.team?.logos?.[0]?.href || away.team?.logo)}<div class="nm">${esc(tname(away.team, true))}</div></div>
-      </div>`;
-
-
-    // معلومات المباراة
-    const gi = d.gameInfo || {};
-    const venue = gi.venue?.fullName || c.venue?.fullName;
-    const city = [gi.venue?.address?.city, gi.venue?.address?.country].filter(Boolean).join('، ');
-    const ref = (gi.officials || []).find(o => /referee/i.test(o.position?.name || o.position?.displayName || '') || o.order === 1) || (gi.officials || [])[0];
-    const intl = [...new Set([...(d.broadcasts || []), ...(c.broadcasts || [])].map(b => b.media?.shortName || b.names?.[0]).filter(Boolean))];
-    const rows0 = [
-      ['📺 القناة الناقلة', CHANNELS[lid] || ''],
-      ['🌍 قنوات عالمية', intl.slice(0,4).join('، ')],
-      ['🎙️ المعلق', COMMENTATORS[lid] || ''],
-      ['🏟️ الملعب', venue],
-      ['📍 المدينة', city],
-      ['🧑‍⚖️ الحكم', ref?.fullName || ref?.displayName],
-      ['👥 الحضور', gi.attendance ? Number(gi.attendance).toLocaleString('ar') : '']
-    ].filter(r => r[1]);
-    if(rows0.length) html += `<div class="sec"><h3>معلومات المباراة</h3>${rows0.map(r => `<div class="info"><span>${r[0]}</span><b>${esc(r[1])}</b></div>`).join('')}</div>`;
-
-    // التشكيلة
-    const lu = lineupsHTML(d.rosters);
-    html += lu || `<div class="sec"><h3>التشكيلة والخطة</h3><div class="msg" style="padding:14px">${st === 'pre' ? 'التشكيلة تنزل قبل المباراة بساعة تقريباً' : 'التشكيلة غير متوفرة لهذي المباراة'}</div></div>`;
-
-    // الأحداث
-    const evs = (d.keyEvents || []).map(k => {
-      const t = (k.type?.text || '').toLowerCase();
-      let ic = t.includes('own goal') ? '⚽ (ع.م)' : t.includes('goal') || t.includes('penalty - scored') ? '⚽' : t.includes('yellow') ? '🟨' : t.includes('red') ? '🟥' : t.includes('substitution') ? '🔁' : null;
-      if(!ic) return '';
-      const who = k.participants?.map(p => pname(p.athlete)).filter(Boolean).join(' ← ') || k.shortText || '';
-      const side = k.team?.id === away.team?.id ? 'a' : '';
-      return `<div class="ev ${side}"><span class="min">${esc(k.clock?.displayValue)}</span><span>${ic}</span><span>${esc(who)}</span></div>`;
-    }).join('');
-    if(evs) html += `<div class="sec"><h3>الأحداث</h3>${evs}</div>`;
-
-    // الإحصائيات
-    const bt = d.boxscore?.teams || [];
-    const hs = bt.find(t => t.team?.id === home.team?.id)?.statistics || [];
-    const as = bt.find(t => t.team?.id === away.team?.id)?.statistics || [];
-    const rows = Object.entries(STATS).map(([k, lbl]) => {
-      const h = hs.find(s => s.name === k), a = as.find(s => s.name === k);
-      if(!h || !a) return '';
-      const hv = parseFloat(h.displayValue) || 0, av = parseFloat(a.displayValue) || 0, tot = hv + av || 1;
-      return `<div class="stat"><div class="row"><b>${esc(h.displayValue)}</b><span>${lbl}</span><b>${esc(a.displayValue)}</b></div>
-        <div class="bar"><i style="width:${hv/tot*100}%"></i><i class="b" style="width:${av/tot*100}%"></i></div></div>`;
-    }).join('');
-    if(rows) html += `<div class="sec"><h3>الإحصائيات</h3>${rows}</div>`;
-
-    if(false) html += '<div class="msg">التفاصيل تظهر أول ما تبدي المباراة</div>';
-    if(!openNow || openNow.eid !== eid) return; // انسدت أو انفتحت مباراة ثانية
-    panel.innerHTML = html;
-    if(silent){
-      if(keepTab > 0){ const b = document.querySelectorAll('.tabs2 button')[keepTab]; if(b) showLU(keepTab, b); }
-      panel.scrollTop = keepScroll;
-    }
+    if(!openNow || openNow.eid !== eid) return;
+    sheetData = {d, lid, eid};
+    panel.innerHTML = renderSheet(d, lid);
+    if(silent) panel.scrollTop = keepScroll;
   }catch(err){
-    if(silent) return; // إذا فشل التحديث، خلي الموجود
-    panel.innerHTML = '<button class="close" onclick="closeSheet()">✕</button><div class="msg">ما گدرت أجيب التفاصيل</div>';
+    if(silent) return;
+    panel.innerHTML = topBar(lid) + emptyBox(I.wifi, 'ما گدرت أجيب تفاصيل المباراة', `<button class="btn" onclick="openMatch('${lid}','${eid}')">${I.refresh}إعادة المحاولة</button>`);
   }
 }
-function closeSheet(){ $('sheet').classList.remove('show'); openNow = null; }
+function topBar(lid){
+  const lg = leagueLogo(lid);
+  return `<div class="ptop"><button class="ib" onclick="closeSheet()" aria-label="إغلاق">${I.close}</button>
+    <div class="lt">${lg ? `<img src="${esc(lg)}" alt="">` : ''}<span>${esc(leagueOf(lid).n)}</span></div>
+    <button class="ib" onclick="shareMatch()" aria-label="مشاركة">${I.share}</button></div>`;
+}
+function closeSheet(){ $('sheet').classList.remove('show'); openNow = null; sheetData = null; }
 $('sheet').onclick = e => { if(e.target.id === 'sheet') closeSheet(); };
 
-// ===== جدول الترتيب =====
+function renderSheet(d, lid){
+  const c = d.header?.competitions?.[0] || {}, {H, A} = sides(c), s = status(c.status);
+  const hc = teamColor(H.team), ac = teamColor(A.team);
+  let center;
+  if(s.k === 'pre' || s.k === 'off'){
+    center = `<span class="htime num">${fmtTime(c.date)}</span><span class="hdate">${fmtDate(c.date)}</span>${s.k === 'off' ? `<span class="pill">${s.label}</span>` : ''}`;
+  } else {
+    center = `<div class="big"><span class="num">${esc(H.score)}</span><i>-</i><span class="num">${esc(A.score)}</span></div>
+      ${(H.shootoutScore != null) ? `<span class="pill num">ترجيح (${H.shootoutScore} - ${A.shootoutScore})</span>` : ''}
+      <span class="pill ${s.k === 'live' ? 'live' : ''}"><span class="num">${esc(s.label)}</span></span>`;
+  }
+  // الهدافين تحت كل فريق
+  const goals = (d.keyEvents || []).filter(k => evKind(k).goal);
+  const sc = side => goals.filter(k => (k.team?.id === side.team?.id) !== (evKind(k).own === true))
+    .map(k => `<span><b>${esc(pname(k.participants?.[0]?.athlete, true))}</b> <span class="num">${esc(k.clock?.displayValue || '')}</span>${evKind(k).own ? ' (عكسي)' : evKind(k).pen ? ' (جزاء)' : ''}</span>`).join('');
+  const hs = sc(H), as = sc(A);
+
+  const hero = `<div class="hero" style="--hc:${hc};--ac:${ac}">
+    <div class="hrow">
+      <div class="hteam"><div class="lw">${logo(H.team)}</div><div class="nm">${esc(tname(H.team, true))}</div></div>
+      <div class="hmid">${center}</div>
+      <div class="hteam"><div class="lw">${logo(A.team)}</div><div class="nm">${esc(tname(A.team, true))}</div></div>
+    </div>
+    ${hs || as ? `<div class="scorers"><div>${hs}</div><div>${as}</div></div>` : ''}
+  </div>`;
+
+  const tabs = `<div class="tabs">${TABS.map(([k,l,i]) => `<button class="tab ${state.tab===k?'on':''}" data-tab="${k}">${I[i]}${l}</button>`).join('')}</div>`;
+  const panes = {
+    events: tEvents(d, H, A, s),
+    stats: tStats(d, H, A),
+    info: tInfo(d, c, lid),
+    lineup: tLineup(d, s),
+    fav: tFav(H, A)
+  };
+  return topBar(lid) + hero + tabs + TABS.map(([k]) => `<div class="pane ${state.tab===k?'on':''}" data-pane="${k}">${panes[k]}</div>`).join('');
+}
+$('panel').addEventListener('click', e => {
+  const t = e.target.closest('.tab');
+  if(t){
+    state.tab = t.dataset.tab;
+    $('panel').querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === t));
+    $('panel').querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.dataset.pane === state.tab));
+    t.scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'});
+    return;
+  }
+  const lb = e.target.closest('.lsw button');
+  if(lb){
+    state.luIdx = +lb.dataset.i;
+    lb.parentNode.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === lb));
+    $('panel').querySelectorAll('.lu').forEach(x => x.style.display = +x.dataset.i === state.luIdx ? '' : 'none');
+    return;
+  }
+  const fb = e.target.closest('[data-fav]');
+  if(fb){ toggleFav(fb.dataset.fav, fb.dataset.n, fb.dataset.logo, fb.dataset.color); }
+});
+
+// ----- نوع الحدث -----
+function evKind(k){
+  const t = (k.type?.text || k.type?.type || '').toLowerCase();
+  if(t.includes('own goal')) return {goal:true, own:true, label:'هدف عكسي'};
+  if(t.includes('penalty') && (t.includes('miss') || t.includes('saved'))) return {miss:true, label:'ضربة جزاء ضائعة'};
+  if(t.includes('penalty') && (t.includes('scored') || t.includes('goal'))) return {goal:true, pen:true, label:'هدف من ضربة جزاء'};
+  if(t.includes('goal')) return {goal:true, label: t.includes('header') ? 'هدف برأسية' : 'هدف'};
+  if(t.includes('second yellow') || t.includes('yellow-red') || t.includes('yellow red')) return {red:true, label:'إنذار ثاني وطرد'};
+  if(t.includes('red')) return {red:true, label:'بطاقة حمراء'};
+  if(t.includes('yellow')) return {yellow:true, label:'بطاقة صفراء'};
+  if(t.includes('substitution')) return {sub:true, label:'تبديل'};
+  if(t.includes('var')) return {var:true, label:'مراجعة الفار'};
+  if(t.includes('kickoff') || t.includes('kick off') || t.includes('first half begins')) return {div:'بداية المباراة'};
+  if(t.includes('halftime') || t.includes('half time') || t.includes('end of first half') || t.includes('first half ends')) return {div:'نهاية الشوط الأول'};
+  if(t.includes('second half') || t.includes('2nd half')) return {div:'بداية الشوط الثاني'};
+  if(t.includes('extra time') || t.includes('extra-time')) return {div:'الأشواط الإضافية'};
+  if(t.includes('shootout')) return {div:'ركلات الترجيح'};
+  if(t.includes('end regular') || t.includes('full time') || t.includes('end of match') || t.includes('match ends') || t.includes('end game')) return {div:'نهاية المباراة'};
+  return {};
+}
+
+// ----- ١) المجريات -----
+function tEvents(d, H, A, s){
+  const list = (d.keyEvents || []).map(k => ({k, x: evKind(k)})).filter(o => o.x.label || o.x.div);
+  if(!list.length) return `<div class="box"><div class="note">${s.k === 'pre' ? 'المجريات تبدي أول ما تنطلق المباراة ⏱️' : 'ماكو مجريات مسجلة لهذي المباراة'}</div></div>`;
+  const items = list.reverse().map(({k, x}) => {
+    if(x.div) return `<div class="div"><span>${x.div}</span></div>`;
+    const away = k.team?.id && k.team.id === A.team?.id;
+    const ps = k.participants || [];
+    let icon, main = pname(ps[0]?.athlete), sub = x.label;
+    if(x.goal) icon = '⚽';
+    else if(x.miss) icon = '✕';
+    else if(x.yellow) icon = '<i class="card-y"></i>';
+    else if(x.red) icon = '<i class="card-r"></i>';
+    else if(x.sub){ icon = '<span class="sub-ic"><i>▲</i><i>▼</i></span>'; if(ps[1]) sub = 'خروج: ' + pname(ps[1].athlete, true); }
+    else if(x.var) icon = '📺';
+    if(x.goal && ps[1] && !x.own && !x.pen) sub = x.label + ' • صناعة ' + pname(ps[1].athlete, true);
+    if(!main) main = x.label;
+    return `<div class="ev ${away ? 'a' : 'h'} ${x.goal ? 'goal' : ''}">
+      <div class="bd"><span class="ic">${icon}</span><span class="tx"><b>${esc(main)}</b><small>${esc(sub)}</small></span></div>
+      <span class="mn num">${esc(k.clock?.displayValue || '')}</span></div>`;
+  }).join('');
+  return `<div class="box"><div class="tl">${items}</div></div>`;
+}
+
+// ----- ٢) الإحصائيات -----
+const STATS = [
+  ['totalShots','التسديدات'], ['shotsOnTarget','على المرمى'], ['wonCorners','الركنيات'],
+  ['saves','التصديات'], ['totalPasses','التمريرات'], ['accuratePasses','تمريرات صحيحة'], ['passPct','دقة التمرير'],
+  ['totalCrosses','العرضيات'], ['totalTackles','الافتكاك'], ['interceptions','قطع الكرة'],
+  ['foulsCommitted','الأخطاء'], ['offsides','التسلل'], ['yellowCards','بطاقات صفراء'], ['redCards','بطاقات حمراء']
+];
+const LOWER_BETTER = ['foulsCommitted','offsides','yellowCards','redCards'];
+function statVal(st, key){
+  const o = st.find(x => x.name === key); if(!o) return null;
+  let v = parseFloat(o.displayValue ?? o.value); if(isNaN(v)) return null;
+  if(key === 'passPct' && v <= 1) v *= 100;
+  return {v, txt: key === 'passPct' ? Math.round(v) + '%' : String(o.displayValue ?? v)};
+}
+function tStats(d, H, A){
+  const bt = d.boxscore?.teams || [];
+  const hs = bt.find(t => t.team?.id === H.team?.id)?.statistics || [];
+  const as = bt.find(t => t.team?.id === A.team?.id)?.statistics || [];
+  const ph = statVal(hs, 'possessionPct'), pa = statVal(as, 'possessionPct');
+  const rows = STATS.map(([k, lbl]) => {
+    const h = statVal(hs, k), a = statVal(as, k); if(!h || !a) return '';
+    const tot = (h.v + a.v) || 1, low = LOWER_BETTER.includes(k);
+    const hw = low ? h.v < a.v : h.v > a.v, aw = low ? a.v < h.v : a.v > h.v;
+    return `<div class="st-row"><div class="st-top"><b class="num ${hw?'w':'l'}">${esc(h.txt)}</b><span>${lbl}</span><b class="num ${aw?'w':'l'}">${esc(a.txt)}</b></div>
+      <div class="dual"><div><i class="hbar ${hw||h.v===a.v?'':'dim'}" style="width:${h.v/tot*100}%"></i></div><div><i class="abar ${aw||h.v===a.v?'':'dim'}" style="width:${a.v/tot*100}%"></i></div></div></div>`;
+  }).join('');
+  if(!ph && !rows) return `<div class="box"><div class="note">الإحصائيات تظهر أثناء المباراة 📊</div></div>`;
+  const key = `<div class="st-key"><span><i style="background:var(--acc)"></i>${esc(tname(H.team))}</span><span>${esc(tname(A.team))}<i style="background:var(--away)"></i></span></div>`;
+  const poss = ph && pa ? `<div class="box"><h3>${I.clock}الاستحواذ</h3>
+      <div class="poss"><b class="num" style="color:var(--acc)">${Math.round(ph.v)}%</b><span>استحواذ على الكرة</span><b class="num" style="color:var(--away)">${Math.round(pa.v)}%</b></div>
+      <div class="pbar"><i style="width:${ph.v}%;background:var(--acc)"></i><i style="width:${pa.v}%;background:var(--away)"></i></div></div>` : '';
+  return poss + (rows ? `<div class="box"><h3>${I.stats}أرقام المباراة</h3>${key}${rows}</div>` : '');
+}
+
+// ----- ٣) معلومات المباراة -----
+function tInfo(d, c, lid){
+  const gi = d.gameInfo || {};
+  const venue = gi.venue?.fullName || c.venue?.fullName;
+  const city = [gi.venue?.address?.city, gi.venue?.address?.country].filter(Boolean).join('، ');
+  const offs = gi.officials || [];
+  const ref = offs.find(o => /referee/i.test(o.position?.name || o.position?.displayName || '') && !/assist|video|fourth/i.test(o.position?.name || '')) || offs[0];
+  const intl = [...new Set([...(d.broadcasts || []), ...(c.broadcasts || [])].map(b => b.media?.shortName || b.names?.[0] || b.market?.type).filter(x => x && typeof x === 'string'))];
+  const tiles = [
+    [I.trophy, 'البطولة', leagueOf(lid).n, true],
+    [I.cal, 'الموعد', c.date ? fmtDate(c.date) + ' • ' + fmtTime(c.date) : '', true],
+    [I.tv, 'القناة الناقلة', CHANNELS[lid]],
+    [I.mic, 'المعلق', COMMENTATORS[lid]],
+    [I.stadium, 'الملعب', venue],
+    [I.pin, 'المدينة', city],
+    [I.whistle, 'الحكم', ref?.fullName || ref?.displayName],
+    [I.users, 'الحضور', gi.attendance ? Number(gi.attendance).toLocaleString(LOC) + ' متفرج' : ''],
+    [I.globe, 'قنوات عالمية', intl.slice(0,4).join('، '), true]
+  ];
+  return `<div class="info">${tiles.map(([icon, l, v, wide]) => {
+    if(!v && (l === 'الحضور' || l === 'قنوات عالمية' || l === 'المدينة')) return '';
+    return `<div class="tile ${wide?'w':''} ${v?'':'empty-v'}"><span class="ti">${icon}</span><small>${l}</small><b>${esc(v || 'غير متوفر')}</b></div>`;
+  }).join('')}</div>`;
+}
+
+// ----- ٤) التشكيلة والخطة -----
+function posGroup(p){
+  const a = String(p.position?.abbreviation || p.position?.name || '').toUpperCase();
+  if(/^G/.test(a)) return 0;
+  if(/^(D|CD|CB|LB|RB|LWB|RWB|SW)/.test(a) || /BACK|DEFEN/.test(a)) return 1;
+  if(/^(F|CF|ST|LW|RW|SS|W)/.test(a) || /FORWARD|STRIKER|WING/.test(a)) return 3;
+  return 2;
+}
+function teamLineup(r){
+  const list = r.roster || [], starters = list.filter(p => p.starter), subs = list.filter(p => !p.starter);
+  const col = teamColor(r.team), ink = inkOn(col);
+  const dot = p => `<div class="pl"><i style="background:${col};color:${ink}" class="num">${esc(p.jersey ?? '')}</i><span>${esc(pname(p.athlete, true))}</span></div>`;
+  const gk = starters.filter(p => posGroup(p) === 0).slice(0,1);
+  const out = starters.filter(p => !gk.includes(p)).sort((a,b) => posGroup(a) - posGroup(b) || (a.formationPlace ?? 99) - (b.formationPlace ?? 99));
+  const form = String(r.formation || '').trim();
+  const counts = /^\d(-\d)+$/.test(form) ? form.split('-').map(Number) : null;
+  let rows = [];
+  if(counts && counts.reduce((x,y) => x + y, 0) === out.length){ let i = 0; rows = counts.map(n => out.slice(i, i += n)); }
+  else [1,2,3].forEach(g => { const rr = out.filter(p => posGroup(p) === g); if(rr.length) rows.push(rr); });
+  const pitch = `<div class="pitch"><span class="mk cc"></span><span class="mk pb"></span><span class="mk gb"></span><span class="mk ar"></span>
+    <div class="pp"><div class="prow">${gk.map(dot).join('')}</div>${rows.map(rr => `<div class="prow">${rr.map(dot).join('')}</div>`).join('')}</div></div>`;
+  const subsHtml = subs.length ? `<div class="box" style="margin-top:12px"><h3>${I.users}الاحتياط</h3><div class="subs">${subs.map(p =>
+    `<div class="sub"><span class="jn num">${esc(p.jersey ?? '')}</span><span>${esc(pname(p.athlete))}</span>${p.subbedIn ? '<span class="in">▲ دخل</span>' : ''}</div>`).join('')}</div></div>` : '';
+  return `<div class="box"><div class="fhead"><span>الخطة</span><b>${esc(form || '—')}</b></div>${pitch}</div>${subsHtml}`;
+}
+function tLineup(d, s){
+  const rs = (d.rosters || []).filter(r => (r.roster || []).some(p => p.starter));
+  if(!rs.length) return `<div class="box"><div class="note">${s.k === 'pre' ? 'التشكيلة تنزل قبل المباراة بساعة تقريباً 👕' : 'التشكيلة غير متوفرة لهذي المباراة'}</div></div>`;
+  rs.sort((a,b) => (a.homeAway === 'home' ? 0 : 1) - (b.homeAway === 'home' ? 0 : 1));
+  if(state.luIdx >= rs.length) state.luIdx = 0;
+  return `<div class="lsw">${rs.map((r,i) => `<button class="${i===state.luIdx?'on':''}" data-i="${i}">${logo(r.team)}<span>${esc(tname(r.team))}</span></button>`).join('')}</div>
+    ${rs.map((r,i) => `<div class="lu" data-i="${i}" style="${i===state.luIdx?'':'display:none'}">${teamLineup(r)}</div>`).join('')}`;
+}
+
+// ----- ٥) الفرق المفضلة -----
+function tFav(H, A){
+  const card = x => {
+    const t = x.team || {}, on = !!favs[t.id];
+    return `<div class="fcard">${logo(t)}<b>${esc(tname(t, true))}</b>
+      <button class="fbtn ${on?'on':''}" data-fav="${esc(t.id)}" data-n="${esc(tname(t, true))}" data-logo="${esc(teamLogo(t))}" data-color="${esc(teamColor(t))}">${starFill('')}${on ? 'بالمفضلة' : 'أضف للمفضلة'}</button></div>`;
+  };
+  const ids = Object.keys(favs);
+  const list = ids.length ? `<div class="flist">${ids.map(id => { const f = favs[id]; const t = {id, logo:f.logo, color:f.color?.replace('#',''), displayName:f.n};
+      return `<span class="fchip">${logo(t)}${esc(f.n)}<button data-fav="${esc(id)}" aria-label="حذف">${I.close}</button></span>`; }).join('')}</div>`
+    : `<div class="note" style="padding:10px">ما عندك فرق مفضلة بعد</div>`;
+  return `<div class="fcards">${card(H)}${card(A)}</div>
+    <div class="box"><h3>${starFill('')}فرقك المفضلة <span class="num" style="margin-inline-start:auto">${ids.length}</span></h3>${list}
+    <div class="note" style="padding:14px 0 0;text-align:right">⭐ مباريات فرقك المفضلة تطلع بأول القائمة، وتگدر تشوفها كلها من فلتر "المفضلة".</div></div>`;
+}
+function toggleFav(id, n, lg, color){
+  if(!id) return;
+  if(favs[id]){ delete favs[id]; toast('انشال من المفضلة'); }
+  else { favs[id] = {n, logo:lg, color}; toast('⭐ انضاف ' + n + ' للمفضلة'); }
+  LS.set('f24.favs', favs);
+  if(sheetData){ const keep = $('panel').scrollTop; $('panel').innerHTML = renderSheet(sheetData.d, sheetData.lid); $('panel').scrollTop = keep; }
+  render();
+}
+
+// ----- مشاركة النتيجة -----
+function shareMatch(){
+  if(!sheetData) return;
+  const c = sheetData.d.header?.competitions?.[0] || {}, {H, A} = sides(c), s = status(c.status);
+  const txt = s.k === 'pre' || s.k === 'off'
+    ? `${tname(H.team,true)} × ${tname(A.team,true)} — ${fmtDate(c.date)} ${fmtTime(c.date)}`
+    : `${tname(H.team,true)} ${H.score} - ${A.score} ${tname(A.team,true)} (${s.label})`;
+  const full = `⚽ ${txt}\n${leagueOf(sheetData.lid).n}\n— Football 24`;
+  if(navigator.share) navigator.share({text: full}).catch(() => {});
+  else if(navigator.clipboard) navigator.clipboard.writeText(full).then(() => toast('انسخت النتيجة ✓'), () => toast(txt));
+  else toast(txt);
+}
+
+// =====================================================================
+//  الترتيب
+// =====================================================================
+const ZONE_AR = [[/champions league/i,'دوري الأبطال'],[/europa league/i,'الدوري الأوروبي'],[/conference/i,'دوري المؤتمر'],[/relegation playoff|relegation play-off/i,'ملحق الهبوط'],[/relegation/i,'الهبوط'],[/promotion/i,'الصعود'],[/knockout|round of 16|playoff|play-off/i,'الأدوار الإقصائية'],[/afc champions/i,'أبطال آسيا']];
+const zoneName = s => { for(const [r, a] of ZONE_AR) if(r.test(s)) return a; return s; };
 async function loadTable(){
-  main.innerHTML = spinner;
+  const lid = state.tableLeague;
+  $('main').innerHTML = `<div class="group">${'<div class="sk"></div>'.repeat(8)}</div>`;
   try{
-    const d = await getJSON(`${API_TABLE}${state.league}/standings`);
+    const d = await getJSON(`${API_TABLE}${lid}/standings`);
+    if(state.view !== 'table' || state.tableLeague !== lid) return;
     const blocks = d.children?.length ? d.children : [d];
     const out = blocks.map(b => {
-      const entries = b.standings?.entries || [];
-      if(!entries.length) return '';
+      const entries = b.standings?.entries || []; if(!entries.length) return '';
       const sv = (e, n) => e.stats?.find(s => s.name === n);
       entries.sort((x,y) => (sv(x,'rank')?.value ?? 99) - (sv(y,'rank')?.value ?? 99) || (sv(y,'points')?.value ?? 0) - (sv(x,'points')?.value ?? 0));
-      return `<div class="group">${blocks.length > 1 ? `<div class="ghead">${esc(b.name)}</div>` : ''}
-        <table><tr><th>#</th><th style="text-align:right">الفريق</th><th>لعب</th><th>ف</th><th>ت</th><th>خ</th><th>+/-</th><th>نقاط</th></tr>
-        ${entries.map((e,i) => `<tr><td>${sv(e,'rank')?.displayValue || i+1}</td>
-          <td class="tn">${img(e.team?.logos?.[0]?.href)}${esc(tname(e.team))}</td>
-          <td>${sv(e,'gamesPlayed')?.displayValue ?? '-'}</td><td>${sv(e,'wins')?.displayValue ?? '-'}</td>
-          <td>${sv(e,'ties')?.displayValue ?? '-'}</td><td>${sv(e,'losses')?.displayValue ?? '-'}</td>
-          <td style="direction:ltr">${sv(e,'pointDifferential')?.displayValue ?? '-'}</td>
-          <td class="pts">${sv(e,'points')?.displayValue ?? '-'}</td></tr>`).join('')}
-        </table></div>`;
+      const zones = new Map();
+      entries.forEach(e => { if(e.note?.color && e.note?.description) zones.set(e.note.color, zoneName(e.note.description)); });
+      return `<div class="group">${blocks.length > 1 ? `<div class="gh">${esc(b.name)}</div>` : ''}
+        <table class="tbl"><tr><th>#</th><th style="text-align:right">الفريق</th><th>لعب</th><th>ف</th><th>ت</th><th>خ</th><th>+/-</th><th>نقاط</th></tr>
+        ${entries.map((e,i) => `<tr class="${favs[e.team?.id] ? 'fav' : ''}">
+          <td class="rk num">${e.note?.color ? `<i style="background:${esc(e.note.color)}"></i>` : ''}${esc(sv(e,'rank')?.displayValue || i+1)}</td>
+          <td class="tn"><div>${logo(e.team)}<span>${esc(tname(e.team))}</span>${favs[e.team?.id] ? starFill('fs') : ''}</div></td>
+          <td class="num">${esc(sv(e,'gamesPlayed')?.displayValue ?? '-')}</td><td class="num">${esc(sv(e,'wins')?.displayValue ?? '-')}</td>
+          <td class="num">${esc(sv(e,'ties')?.displayValue ?? '-')}</td><td class="num">${esc(sv(e,'losses')?.displayValue ?? '-')}</td>
+          <td class="num">${esc(sv(e,'pointDifferential')?.displayValue ?? '-')}</td>
+          <td class="pts num">${esc(sv(e,'points')?.displayValue ?? '-')}</td></tr>`).join('')}
+        </table>${zones.size ? `<div class="legend">${[...zones].map(([c,n]) => `<span><i style="background:${esc(c)}"></i>${esc(n)}</span>`).join('')}</div>` : ''}</div>`;
     }).join('');
-    if(state.view !== 'table') return;
-    main.innerHTML = out || '<div class="msg">ماكو جدول ترتيب لهذي البطولة</div>';
+    $('main').innerHTML = out || emptyBox(I.table, 'ماكو جدول ترتيب لهذي البطولة');
   }catch(err){
-    main.innerHTML = '<div class="msg">تعذّر تحميل الترتيب 😕</div>';
+    if(state.view !== 'table') return;
+    $('main').innerHTML = emptyBox(I.wifi, 'تعذّر تحميل الترتيب', `<button class="btn" onclick="loadTable()">${I.refresh}إعادة المحاولة</button>`);
   }
 }
 
-// ===== تحديث تلقائي للمباريات المباشرة =====
+// =====================================================================
+//  تحديث تلقائي
+// =====================================================================
 function refreshLive(){
   if(document.hidden) return;
   if(state.view === 'matches' && sameDay(state.date, new Date())) loadMatches(true);
@@ -848,8 +1380,10 @@ function refreshLive(){
 setInterval(refreshLive, REFRESH_SEC * 1000);
 document.addEventListener('visibilitychange', () => { if(!document.hidden) refreshLive(); });
 
-drawChips(); drawDate(); load();
-if('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(()=>{});
+applyTheme(document.documentElement.getAttribute('data-theme') || 'dark');
+drawBar(); load();
+if('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+
 </script>
 </body>
 </html>

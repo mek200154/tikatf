@@ -2,6 +2,10 @@ package com.football24.app;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
+import android.view.View;
+import android.webkit.JavascriptInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.webkit.WebResourceRequest;
@@ -17,7 +21,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         web = new WebView(this);
-        web.setBackgroundColor(0xFF0D1016);
+        web.setBackgroundColor(0xFF0A0D12);
         setContentView(web);
 
         WebSettings s = web.getSettings();
@@ -25,6 +29,7 @@ public class MainActivity extends Activity {
         s.setDomStorageEnabled(true);
         s.setAllowFileAccess(true);
         s.setTextZoom(100);
+        web.addJavascriptInterface(new Bridge(), "F24");
 
         web.setWebViewClient(new WebViewClient() {
             @Override
@@ -61,5 +66,25 @@ public class MainActivity extends Activity {
         web.evaluateJavascript(
             "(function(){var s=document.getElementById('sheet');if(s&&s.classList.contains('show')){closeSheet();return 1}return 0})()",
             r -> { if (!"1".equals(r)) MainActivity.super.onBackPressed(); });
+    }
+
+    // جسر صغير: الصفحة تبلّغ التطبيق بالوضع (نهاري/ليلي) حتى يتلوّن شريط الحالة
+    private class Bridge {
+        @JavascriptInterface
+        public void theme(final String color, final boolean light) {
+            runOnUiThread(() -> {
+                try {
+                    int c = Color.parseColor(color);
+                    getWindow().setStatusBarColor(c);
+                    getWindow().setNavigationBarColor(c);
+                    web.setBackgroundColor(c);
+                    View d = getWindow().getDecorView();
+                    int f = d.getSystemUiVisibility();
+                    if (Build.VERSION.SDK_INT >= 23) f = light ? (f | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR) : (f & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                    if (Build.VERSION.SDK_INT >= 26) f = light ? (f | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR) : (f & ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+                    d.setSystemUiVisibility(f);
+                } catch (Exception ignored) {}
+            });
+        }
     }
 }
